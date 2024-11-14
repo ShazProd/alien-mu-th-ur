@@ -12,14 +12,21 @@ such as :
 command visible to the player :
 
 STATUS: the status of the Mu-Th-Ur interface
+
 HELP: list of player commands
+
 /M message : type the /m command followed by the message for Mother (mum can reply at this point)
+
 CLEAR: delete the chat
+
 EXIT : close the chat
 
 command not visible to the player but can launch :
+
 special order : an automatic response for all special orders such as 754, 899, 931, 937, 939, 966 indicating that the player does not have administrator rights.
+
 Cerberus: an automatic response indicating that the player does not have administrator rights. 
+
 HACK : which triggers a hack attempt on the player's side to increase their privileges and obtain additional commands or additional responses from mum.
 
 Once the hack has been successfully completed, the special order and cerberus commands are valid and, in the case of the special orders, they will generate automatic responses related to the Alien universe. 

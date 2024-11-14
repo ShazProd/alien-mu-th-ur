@@ -1,0 +1,201 @@
+{
+    "MUTHUR": {
+        "welcome": "MUTHUR 6000 v2.1.0\nTERMINAL ACTIEF...\nINTERFACE 2037\nWACHTEND OP COMMANDO...",
+        "waitingResponse": "WACHTEND OP ANTWOORD...",
+        "help": "BESCHIKBARE COMMANDO'S:\n- HELP: TOON DEZE HULP\n- STATUS: SYSTEEMSTATUS\n- CLEAR: SCHERM WISSEN\n- EXIT: TERMINAL SLUITEN\n- /M [BERICHT]: COMMUNICEER MET MUTHUR\n \nWACHTEND OP COMMANDO...",
+        "status": "MUTHUR 6000 v2.1.0\nALLE SYSTEMEN FUNCTIONEEL\nGEEN ANOMALIEËN GEDETECTEERD",
+        "commandNotFound": "COMMANDO NIET HERKEND. TYP 'HELP' VOOR DE LIJST MET COMMANDO'S.",
+        "sessionEnded": "SESSIE BEËINDIGD",
+        "motherPrefix": "/M",
+        "sessionStarted": "SESSIE GESTART",
+        "newSessionStarted": "=== NIEUWE MUTHUR SESSIE GESTART ===\nHIER ZIJN DE BESCHIKBARE COMMANDO'S VOOR DE SPELER:\nHELP: TOON DEZE HULP\nSTATUS: SYSTEEMSTATUS\nCLEAR: SCHERM WISSEN\nEXIT: TERMINAL SLUITEN\n/M [BERICHT]: COMMUNICEER MET MUTHUR\nHACK: START HET HACK COMMANDO VOOR BEHEERDERRECHTEN\nSPECIAL ORDER: 754, 899, 931, 937, 939, 966, TOON SPECIALE ORDERS\nCERBERUS PROTOCOL: COMMANDO OM ZELFVERNIETIGING TE STARTEN",
+        "muthurSessionEnded": "MUTHUR SESSIE BEËINDIGD",
+        "unknownCommand": "COMMANDO NIET HERKEND. TYP 'HELP' VOOR DE LIJST MET COMMANDO'S",
+        "skip": "OVERSLAAN",
+        "send": "ANTWOORDEN",
+        "sessionActiveWarning": "Een MUTHUR sessie is al actief met {userName}",
+        "sessionStartedBy": "{userName} heeft een MUTHUR sessie gestart",
+        "sessionEndedBy": "{userName} heeft de MUTHUR sessie beëindigd",
+        "systemReady": "MUTHUR 6000 systeem gereed",
+        "inputPlaceholder": "Voer een commando in",
+        "selectCharacter": "Selecteer Karakter",
+        "selectCharacterHint": "Kies het karakter dat met MUTHUR zal communiceren",
+        "Time": {
+                "Minute": "minuut",
+                "Minutes": "minuten",
+                "Second": "seconde",
+                "Seconds": "seconden",
+                "MinutesAndSeconds": "{minutes} {minuteLabel} en {seconds} {secondLabel}",
+                "OnlySeconds": "{seconds} {secondLabel}"
+            },
+        "DONATION": {
+            "support": "Om mijn projecten te steunen:"
+        },
+        "SETTINGS": {
+            "useTokenName": {
+                "name": "Gebruik Karakternaam",
+                "hint": "Gebruik karakternaam in plaats van spelernaam in berichten"
+            },
+            "typewriter": {
+                "name": "Typemachine Effect",
+                "hint": "Activeert progressieve tekstweergave zoals in de Alien film",
+                "enable": "Activeren",
+                "disable": "Deactiveren"
+            },
+            "commandsList": {
+                "name": "MU/TH/UR Commandolijst",
+                "hint": "Volledige lijst van beschikbare commando's voor spelers:",
+                "commands": "HELP: TOON DEZE HULP\nSTATUS: SYSTEEMSTATUS\nCLEAR: SCHERM WISSEN\nEXIT: TERMINAL SLUITEN\nMOTHER [BERICHT]: COMMUNICEER MET MUTHUR\nHACK: START HET HACK COMMANDO VOOR BEHEERDERRECHTEN\nSPECIAL ORDER: 754, 899, 931, 937, 939, 966, TOON SPECIALE ORDERS\nCERBERUS PROTOCOL: COMMANDO OM ZELFVERNIETIGING TE STARTEN"
+            },
+            "hackResult": {
+                "name": "Hack Resultaat",
+                "hint": "Bepaalt of hackpogingen met het HACK commando slagen of mislukken",
+                "random": "Willekeurig",
+                "success": "Altijd Succesvol",
+                "failure": "Altijd Mislukt"
+            },
+            "typingSound": {
+                "name": "Typgeluiden",
+                "hint": "Activeert toetsenbordgeluiden zoals in de Alien film",
+                "enable": "Geactiveerd",
+                "disable": "Gedeactiveerd"
+            },
+            "typingSoundVolume": {
+                "name": "Typgeluid Volume",
+                "hint": "Past het volume van de typgeluiden aan (0 = stil, 1 = maximum)"
+            },
+            "motherResponseColor": {
+                "name": "MOTHER Antwoordkleur",
+                "hint": "Stelt de kleur in van MOTHER's antwoordberichten",
+                "orange": "Oranje",
+                "green": "Groen",
+                "red": "Rood",
+                "white": "Wit",
+                "blue": "Blauw",
+                "yellow": "Geel"
+            },
+            "scanline": {
+                "name": "Scanline Effect",
+                "hint": "Activeert het lichtscan effect voor tekstweergave",
+                "enable": "Geactiveerd",
+                "disable": "Gedeactiveerd"
+            },
+            "scanlineSize": {
+                "name": "Scanline Grootte",
+                "hint": "Stelt de grootte in van het lichtpunt dat de tekstweergave voorafgaat (in pixels)"
+            },
+            "allowHack": {
+                "name": "Hacking Toestaan",
+                "hint": "Staat spelers toe om het HACK commando te gebruiken voor beheerderstoegang",
+                "enable": "Toegestaan",
+                "disable": "Niet Toegestaan"
+            },
+            "allowCerberus": {
+                "name": "Cerberus Protocol Toestaan",
+                "hint": "Staat spelers toe om het zelfvernietigingsprotocol te activeren",
+                "enable": "Toegestaan",
+                "disable": "Niet Toegestaan"
+            },
+            "cerberusDuration": {
+                "name": "Cerberus Protocol Duur",
+                "hint": "Duur in minuten voor zelfvernietiging (1-60 minuten)"
+            }
+        }
+    },
+    "MOTHER": {
+        "HackSuccess": "HACK SUCCESVOL - TOEGANG VERLEEND",
+        "HackFailure": "HACK MISLUKT - TERMINAL VERGRENDELD",
+        "AccessDenied": "!!! TOEGANG GEWEIGERD !!!\n\nONVOLDOENDE AUTORISATIENIVEAU\nBEHEERDERIDENTIFICATIE VEREIST\n\nONGEAUTORISEERDE TOEGANGSPOGING GEREGISTREERD\nFOUTCODE: WY-SEC-451",
+        "HackAttempt": "Hackpoging in uitvoering...",
+        "HackAlreadySuccessful": "BEHEERDERSTOEGANG AL VERKREGEN - NIEUWE HACKPOGING NIET GEAUTORISEERD",
+        "HackDetected": "!!! HACKPOGING GEDETECTEERD !!! - {result}",
+        "Success": "SUCCES",
+        "Failure": "MISLUKT",
+        "CerberusHackAlert": "!!! PRIORITEITSALARM !!! - {userName} HEEFT HET CERBERUS PROTOCOL GEÏNITIEERD",
+        "CerberusConfirmed": "CERBERUS PROTOCOL BEVESTIGD - ZELFVERNIETIGING IN UITVOERING",
+        "CerberusCancelled": "CERBERUS PROTOCOL GEANNULEERD",
+        "CommandNotFound": "COMMANDO NIET HERKEND. TYP 'HELP' VOOR DE LIJST MET COMMANDO'S.",
+        "IntrusionDetected": "!!! INDRINGING GEDETECTEERD !!!",
+        "HackDisabledInfo": "Het HACK commando is momenteel uitgeschakeld in de systeeminstellingen\nWilt u het activeren?",
+        "EnableHack": "ACTIVEREN",
+        "KeepDisabled": "UITGESCHAKELD HOUDEN",
+        "HackEnabled": "HACK COMMANDO GEACTIVEERD\nSpelers kunnen het commando nu gebruiken",
+        "HackKeptDisabled": "HACK COMMANDO BLIJFT UITGESCHAKELD",
+        "SecurityProtocol": "■ VEILIGHEIDSPROTOCOL DELTA-7 GEACTIVEERD ■",
+        "CountermeasuresAttempt": "TEGENMAATREGELEN WORDEN GEPROBEERD...",
+        "CountermeasuresFailed": "!!! TEGENMAATREGELEN MISLUKT !!!",
+        "RootAccess": "ROOT TOEGANG GECOMPROMITTEERD",
+        "AdminPrivileges": ">>> BEHEERDERRECHTEN TOEGEKEND",
+        "SecurityDisabled": "VEILIGHEIDSPROTOCOLLEN UITGESCHAKELD",
+        "FullAccess": "VOLLEDIGE TOEGANG VERLEEND",
+        "WelcomeAdmin": "WELKOM BEHEERDER",
+        "WelcomeAdminFull": "WELKOM BEHEERDER\nWAT KAN IK VOOR U DOEN?",
+        "CountermeasuresActivated": "TEGENMAATREGELEN GEACTIVEERD",
+        "TerminalLocked": "!!! TERMINAL VERGRENDELD !!!",
+        "LocatingIntruder": "INDRINGER LOKALISEREN...",
+        "IPRecorded": "IP COÖRDINATEN GEREGISTREERD",
+        "AccessBlocked": "!!! TOEGANG GEBLOKKEERD !!!",
+        "TerminalLocked24": "TERMINAL VERGRENDELD VOOR 24 UUR",
+        "ForcedDisconnect3": "GEDWONGEN VERBREKING IN 3...",
+        "ConnectionTerminated": "VERBINDING VERBROKEN",
+        "CerberusDisabled": "CERBERUS PROTOCOL UITGESCHAKELD DOOR BEHEERDER",
+        "CerberusActivated": "!!! CERBERUS PROTOCOL GEACTIVEERD !!!",
+        "CerberusWarning": "!!! WAARSCHUWING !!!\nCERBERUS PROTOCOL GEACTIVEERD\nZELFVERNIETIGING GEÏNITIEERD",
+        "CerberusCountdown": "RESTERENDE TIJD TOT DETONATIE:",
+        "CerberusDetonation": "DETONATIE",
+        "CerberusEvacuate": "ONMIDDELLIJKE EVACUATIE VEREIST",
+        "Keywords": {
+            "Ordre": "ORDER",
+            "Special": "SPECIAL",
+            "Special2": "SPECIAL",
+            "Protocol": "PROTOCOL"
+        },
+        "SpecialOrders": {
+            "754": {
+                "name": "SPECIAL ORDER 754",
+                "description": "Onderzoek noodsignaal. Alle andere overwegingen secundair. Bemanning vervangbaar."
+            },
+            "899": {
+                "name": "SPECIAL ORDER 899",
+                "description": "Verzamel xenomorph specimens voor biologische wapenafdeling. Maximale prioriteit. Bemanning vervangbaar."
+            },
+            "931": {
+                "name": "SPECIAL ORDER 931",
+                "description": "Beperk biologische besmetting. Quarantaineprotocollen geactiveerd. Geen uitzonderingen toegestaan."
+            },
+            "937": {
+                "name": "SPECIAL ORDER 937",
+                "description": "Bescherming van xenomorph specimens prioritair. Bemanning vervangbaar."
+            },
+            "939": {
+                "name": "SPECIAL ORDER 939",
+                "description": "Breng levensvatbare monsters terug voor analyse. Absolute geheimhouding vereist. Bemanning vervangbaar."
+            },
+            "966": {
+                "name": "SPECIAL ORDER 966",
+                "description": "Beveilig en behoud alle niet-menselijke artefacten. Maximale prioriteit. Bemanning vervangbaar."
+            },
+            "Cerberus": {
+                "name": "CERBERUS PROTOCOL",
+                "TimeRemaining": "U heeft {time} voor activering van het CERBERUS protocol.",
+                "description": "MAXIMAAL VEILIGHEIDSPROTOCOL GEACTIVEERD\nZELFVERNIETIGING INITIALISATIE\nONMIDDELLIJKE EVACUATIE AANBEVOLEN\nRESTERENDE TIJD TOT DETONATIE: 10:00\n\nWAARSCHUWING: DEZE ACTIE KAN NIET ONGEDAAN WORDEN GEMAAKT",
+                "warning": "!!! WAARSCHUWING !!!\nCERBERUS PROTOCOL GEACTIVEERD\nZELFVERNIETIGING GEÏNITIEERD",
+                "confirmation": "!!! WAARSCHUWING !!!\n\nU STAAT OP HET PUNT HET CERBERUS PROTOCOL TE ACTIVEREN\nDEZE ACTIE ZAL DE ZELFVERNIETIGING VAN HET STATION ACTIVEREN\nGEEN TERUGKEER MOGELIJK\n\nACTIVERING BEVESTIGEN?",
+                "confirm": "BEVESTIGEN",
+                "cancel": "ANNULEREN",
+                "cancelled": "ACTIVERING VAN CERBERUS PROTOCOL GEANNULEERD\nTERUG NAAR NORMALE WERKING",
+                "ProtocolActivated": "CERBERUS PROTOCOL GEACTIVEERD",
+                "Status": "STATUS",
+                "Critical": "KRITIEK",
+                "SelfDestruct": "ZELFVERNIETIGINGSSEQUENTIE GEÏNITIEERD",
+                "Warning": "LAATSTE WAARSCHUWING",
+                "NoReturn": "DEZE ACTIE IS ONOMKEERBAAR",
+                "EvacuateNow": "ONMIDDELLIJKE EVACUATIE VEREIST",
+                "YouAreDead": "Je bent dood",
+                "MissionFailed": "Missie mislukt - Installatie vernietigd",
+                "Stopped": "JE HEBT HET OVERLEEFD",
+                "goodbye": "SUCCES"
+            }
+        }
+    }
+}

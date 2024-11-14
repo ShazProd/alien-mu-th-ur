@@ -10,6 +10,7 @@ it allows you to type several commands on the player side with automatic respons
 such as :
 
 command visible to the player :
+
 STATUS: the status of the Mu-Th-Ur interface
 HELP: list of player commands
 /M message : type the /m command followed by the message for Mother (mum can reply at this point)

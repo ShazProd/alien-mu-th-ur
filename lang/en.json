@@ -1,0 +1,201 @@
+{
+    "MUTHUR": {
+        "welcome": "MUTHUR 6000 v2.1.0\nTERMINAL ACTIVE...\nINTERFACE 2037\nAWAITING COMMAND...",
+        "waitingResponse": "AWAITING RESPONSE...",
+        "help": "AVAILABLE COMMANDS:\n- HELP: DISPLAY THIS HELP\n- STATUS: SYSTEM STATUS\n- CLEAR: CLEAR SCREEN\n- EXIT: CLOSE TERMINAL\n- /M [MESSAGE]: COMMUNICATE WITH MUTHUR\n \nAWAITING COMMAND...",
+        "status": "MUTHUR 6000 v2.1.0\nALL SYSTEMS FUNCTIONAL\nNO ANOMALIES DETECTED",
+        "commandNotFound": "COMMAND NOT RECOGNIZED. TYPE 'HELP' FOR COMMAND LIST.",
+        "sessionEnded": "SESSION TERMINATED",
+        "motherPrefix": "/M",
+        "sessionStarted": "SESSION STARTED",
+        "newSessionStarted": "=== NEW MUTHUR SESSION STARTED ===\nHERE ARE THE AVAILABLE COMMANDS FOR THE PLAYER:\nHELP: DISPLAY THIS HELP\nSTATUS: SYSTEM STATUS\nCLEAR: CLEAR SCREEN\nEXIT: CLOSE TERMINAL\n/M [MESSAGE]: COMMUNICATE WITH MUTHUR\nHACK: INITIATE HACK COMMAND FOR ADMINISTRATOR RIGHTS\nSPECIAL ORDER: 754, 899, 931, 937, 939, 966, DISPLAY SPECIAL ORDERS\nCERBERUS PROTOCOL: COMMAND TO INITIATE SELF-DESTRUCT",
+        "muthurSessionEnded": "MUTHUR SESSION TERMINATED",
+        "unknownCommand": "COMMAND NOT RECOGNIZED. TYPE 'HELP' FOR COMMAND LIST",
+        "skip": "SKIP",
+        "send": "REPLY",
+        "sessionActiveWarning": "A MUTHUR session is already active with {userName}",
+        "sessionStartedBy": "{userName} has started a MUTHUR session",
+        "sessionEndedBy": "{userName} has ended their MUTHUR session",
+        "systemReady": "MUTHUR 6000 system ready",
+        "inputPlaceholder": "Enter a command",
+        "selectCharacter": "Select Character",
+        "selectCharacterHint": "Choose the character who will communicate with MUTHUR",
+        "Time": {
+                "Minute": "minute",
+                "Minutes": "minutes",
+                "Second": "second",
+                "Seconds": "seconds",
+                "MinutesAndSeconds": "{minutes} {minuteLabel} and {seconds} {secondLabel}",
+                "OnlySeconds": "{seconds} {secondLabel}"
+            },
+        "DONATION": {
+            "support": "To support my projects:"
+        },
+        "SETTINGS": {
+            "useTokenName": {
+                "name": "Use Character Name",
+                "hint": "Use character name instead of player name in messages"
+            },
+            "typewriter": {
+                "name": "Typewriter Effect",
+                "hint": "Enables progressive text display like in the Alien movie",
+                "enable": "Enable",
+                "disable": "Disable"
+            },
+            "commandsList": {
+                "name": "MU/TH/UR Commands List",
+                "hint": "Complete list of available commands for players:",
+                "commands": "HELP: DISPLAY THIS HELP\nSTATUS: SYSTEM STATUS\nCLEAR: CLEAR SCREEN\nEXIT: CLOSE TERMINAL\nMOTHER [MESSAGE]: COMMUNICATE WITH MUTHUR\nHACK: INITIATE HACK COMMAND FOR ADMINISTRATOR RIGHTS\nSPECIAL ORDER: 754, 899, 931, 937, 939, 966, DISPLAY SPECIAL ORDERS\nCERBERUS PROTOCOL: COMMAND TO INITIATE SELF-DESTRUCT"
+            },
+            "hackResult": {
+                "name": "Hack Result",
+                "hint": "Determines if hack attempts succeed or fail with the HACK command",
+                "random": "Random",
+                "success": "Always Succeed",
+                "failure": "Always Fail"
+            },
+            "typingSound": {
+                "name": "Typing Sounds",
+                "hint": "Enables keyboard typing sounds like in the Alien movie",
+                "enable": "Enabled",
+                "disable": "Disabled"
+            },
+            "typingSoundVolume": {
+                "name": "Typing Volume",
+                "hint": "Adjusts typing sound volume (0 = mute, 1 = maximum)"
+            },
+            "motherResponseColor": {
+                "name": "MOTHER Response Color",
+                "hint": "Sets the color of MOTHER's response messages",
+                "orange": "Orange",
+                "green": "Green",
+                "red": "Red",
+                "white": "White",
+                "blue": "Blue",
+                "yellow": "Yellow"
+            },
+            "scanline": {
+                "name": "Scanline Effect",
+                "hint": "Enables the light scanning effect before text display",
+                "enable": "Enabled",
+                "disable": "Disabled"
+            },
+            "scanlineSize": {
+                "name": "Scanline Size",
+                "hint": "Sets the size of the light point that precedes text display (in pixels)"
+            },
+            "allowHack": {
+                "name": "Allow Hacking",
+                "hint": "Allows players to use the HACK command to attempt administrator access",
+                "enable": "Allowed",
+                "disable": "Not Allowed"
+            },
+            "allowCerberus": {
+                "name": "Allow Cerberus Protocol",
+                "hint": "Allows players to activate the self-destruct protocol",
+                "enable": "Allowed",
+                "disable": "Not Allowed"
+            },
+            "cerberusDuration": {
+                "name": "Cerberus Protocol Duration",
+                "hint": "Duration in minutes before self-destruct (1-60 minutes)"
+            }
+        }
+    },
+    "MOTHER": {
+        "HackSuccess": "HACK SUCCESSFUL - ACCESS GRANTED",
+        "HackFailure": "HACK FAILED - TERMINAL LOCKED",
+        "AccessDenied": "!!! ACCESS DENIED !!!\n\nINSUFFICIENT AUTHORIZATION LEVEL\nADMINISTRATOR IDENTIFICATION REQUIRED\n\nUNAUTHORIZED ACCESS ATTEMPT LOGGED\nERROR CODE: WY-SEC-451",
+        "HackAttempt": "Hack Attempt in Progress...",
+        "HackAlreadySuccessful": "ADMINISTRATOR ACCESS ALREADY OBTAINED - NEW HACK ATTEMPT NOT AUTHORIZED",
+        "HackDetected": "!!! HACK ATTEMPT DETECTED !!! - {result}",
+        "Success": "SUCCESS",
+        "Failure": "FAILURE",
+        "CerberusHackAlert": "!!! PRIORITY ALERT !!! - {userName} HAS INITIATED CERBERUS PROTOCOL",
+        "CerberusConfirmed": "CERBERUS PROTOCOL CONFIRMED - SELF-DESTRUCT IN PROGRESS",
+        "CerberusCancelled": "CERBERUS PROTOCOL CANCELLED",
+        "CommandNotFound": "COMMAND NOT RECOGNIZED. TYPE 'HELP' FOR COMMAND LIST.",
+        "IntrusionDetected": "!!! INTRUSION DETECTED !!!",
+        "HackDisabledInfo": "The HACK command is currently disabled in system settings\nWould you like to enable it?",
+        "EnableHack": "ENABLE",
+        "KeepDisabled": "KEEP DISABLED",
+        "HackEnabled": "HACK COMMAND ENABLED\nPlayers can now use the command",
+        "HackKeptDisabled": "HACK COMMAND KEPT DISABLED",
+        "SecurityProtocol": "■ SECURITY PROTOCOL DELTA-7 ACTIVATED ■",
+        "CountermeasuresAttempt": "ATTEMPTING COUNTERMEASURES...",
+        "CountermeasuresFailed": "!!! COUNTERMEASURES FAILED !!!",
+        "RootAccess": "ROOT ACCESS COMPROMISED",
+        "AdminPrivileges": ">>> ADMINISTRATOR PRIVILEGES GRANTED",
+        "SecurityDisabled": "SECURITY PROTOCOLS DISABLED",
+        "FullAccess": "FULL ACCESS GRANTED",
+        "WelcomeAdmin": "WELCOME ADMINISTRATOR",
+        "WelcomeAdminFull": "WELCOME ADMINISTRATOR\nWHAT CAN I DO FOR YOU?",
+        "CountermeasuresActivated": "COUNTERMEASURES ACTIVATED",
+        "TerminalLocked": "!!! TERMINAL LOCKED !!!",
+        "LocatingIntruder": "LOCATING INTRUDER...",
+        "IPRecorded": "IP COORDINATES RECORDED",
+        "AccessBlocked": "!!! ACCESS BLOCKED !!!",
+        "TerminalLocked24": "TERMINAL LOCKED FOR 24 HOURS",
+        "ForcedDisconnect3": "FORCED DISCONNECT IN 3...",
+        "ConnectionTerminated": "CONNECTION TERMINATED",
+        "CerberusDisabled": "CERBERUS PROTOCOL DISABLED BY ADMINISTRATOR",
+        "CerberusActivated": "!!! CERBERUS PROTOCOL ACTIVATED !!!",
+        "CerberusWarning": "!!! WARNING !!!\nCERBERUS PROTOCOL ACTIVATED\nSELF-DESTRUCT INITIATED",
+        "CerberusCountdown": "TIME REMAINING UNTIL DETONATION:",
+        "CerberusDetonation": "DETONATION",
+        "CerberusEvacuate": "IMMEDIATE EVACUATION REQUIRED",
+        "Keywords": {
+            "Ordre": "ORDER",
+            "Special": "SPECIAL",
+            "Special2": "SPECIAL",
+            "Protocol": "PROTOCOL"
+        },
+        "SpecialOrders": {
+            "754": {
+                "name": "SPECIAL ORDER 754",
+                "description": "Investigate any distress signal. All other considerations secondary. Crew expendable."
+            },
+            "899": {
+                "name": "SPECIAL ORDER 899",
+                "description": "Collect xenomorph specimens for biological weapons division. Maximum priority. Crew expendable."
+            },
+            "931": {
+                "name": "SPECIAL ORDER 931",
+                "description": "Contain any biological contamination. Quarantine protocols activated. No exceptions authorized."
+            },
+            "937": {
+                "name": "SPECIAL ORDER 937",
+                "description": "Protection of xenomorph specimens priority. Crew expendable."
+            },
+            "939": {
+                "name": "SPECIAL ORDER 939",
+                "description": "Return viable samples for analysis. Absolute confidentiality required. Crew expendable."
+            },
+            "966": {
+                "name": "SPECIAL ORDER 966",
+                "description": "Secure and preserve any non-human artifacts. Maximum priority. Crew expendable."
+            },
+            "Cerberus": {
+                "name": "CERBERUS PROTOCOL",
+                "TimeRemaining": "You have {time} before CERBERUS protocol activation.",
+                "description": "MAXIMUM SECURITY PROTOCOL ACTIVATED\nSELF-DESTRUCT INITIALIZATION\nIMMEDIATE EVACUATION RECOMMENDED\nTIME REMAINING UNTIL DETONATION: 10:00\n\nWARNING: THIS ACTION CANNOT BE UNDONE",
+                "warning": "!!! WARNING !!!\nCERBERUS PROTOCOL ACTIVATED\nSELF-DESTRUCT INITIATED",
+                "confirmation": "!!! WARNING !!!\n\nYOU ARE ABOUT TO ACTIVATE THE CERBERUS PROTOCOL\nTHIS ACTION WILL TRIGGER THE STATION'S SELF-DESTRUCT\nNO RETURN WILL BE POSSIBLE\n\nCONFIRM ACTIVATION?",
+                "confirm": "CONFIRM",
+                "cancel": "CANCEL",
+                "cancelled": "CERBERUS PROTOCOL ACTIVATION CANCELLED\nRETURNING TO NORMAL OPERATION",
+                "ProtocolActivated": "CERBERUS PROTOCOL ACTIVATED",
+                "Status": "STATUS",
+                "Critical": "CRITICAL",
+                "SelfDestruct": "SELF-DESTRUCT SEQUENCE INITIATED",
+                "Warning": "FINAL WARNING",
+                "NoReturn": "THIS ACTION IS IRREVERSIBLE",
+                "EvacuateNow": "IMMEDIATE EVACUATION REQUIRED",
+                "YouAreDead": "You are dead",
+                "MissionFailed": "Mission failed - Installation destroyed",
+                "Stopped": "YOU HAVE SURVIVED",
+                "goodbye": "GOOD LUCK"
+            }
+        }
+    }
+}

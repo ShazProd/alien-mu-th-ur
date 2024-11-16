@@ -1,0 +1,201 @@
+{
+    "MUTHUR": {
+        "welcome": "MUTHUR 6000 v2.1.0\nTERMINAL AKTIV...\nSCHNITTSTELLE 2037\nWARTE AUF BEFEHL...",
+        "waitingResponse": "WARTE AUF ANTWORT...",
+        "help": "VERFÜGBARE BEFEHLE:\n- HELP: ZEIGT DIESE HILFE\n- STATUS: SYSTEMSTATUS\n- CLEAR: BILDSCHIRM LÖSCHEN\n- EXIT: TERMINAL SCHLIESSEN\n- /M [NACHRICHT]: MIT MUTHUR KOMMUNIZIEREN\n \nWARTE AUF BEFEHL...",
+        "status": "MUTHUR 6000 v2.1.0\nALLE SYSTEME FUNKTIONSFÄHIG\nKEINE ANOMALIEN ERKANNT",
+        "commandNotFound": "BEFEHL NICHT ERKANNT. GEBEN SIE 'HELP' FÜR DIE BEFEHLSLISTE EIN.",
+        "sessionEnded": "SITZUNG BEENDET",
+        "motherPrefix": "/M",
+        "sessionStarted": "SITZUNG GESTARTET",
+        "newSessionStarted": "=== NEUE MUTHUR-SITZUNG GESTARTET ===\nHIER SIND DIE VERFÜGBAREN BEFEHLE FÜR DEN SPIELER:\nHELP: ZEIGT DIESE HILFE\nSTATUS: SYSTEMSTATUS\nCLEAR: BILDSCHIRM LÖSCHEN\nEXIT: TERMINAL SCHLIESSEN\n/M [NACHRICHT]: MIT MUTHUR KOMMUNIZIEREN\nHACK: STARTET DEN HACK-BEFEHL FÜR ADMINISTRATORRECHTE\nSPECIAL ORDER: 754, 899, 931, 937, 939, 966, ZEIGT SPEZIELLE BEFEHLE\nCERBERUS PROTOCOL: BEFEHL ZUR EINLEITUNG DER SELBSTZERSTÖRUNG",
+        "muthurSessionEnded": "MUTHUR-SITZUNG BEENDET",
+        "unknownCommand": "BEFEHL NICHT ERKANNT. GEBEN SIE 'HELP' FÜR DIE BEFEHLSLISTE EIN",
+        "skip": "ÜBERSPRINGEN",
+        "send": "ANTWORTEN",
+        "sessionActiveWarning": "Eine MUTHUR-Sitzung ist bereits aktiv mit {userName}",
+        "sessionStartedBy": "{userName} hat eine MUTHUR-Sitzung gestartet",
+        "sessionEndedBy": "{userName} hat die MUTHUR-Sitzung beendet",
+        "systemReady": "MUTHUR 6000 System bereit",
+        "inputPlaceholder": "Befehl eingeben",
+        "selectCharacter": "Charakter auswählen",
+        "selectCharacterHint": "Wählen Sie den Charakter aus, der mit MUTHUR kommunizieren wird",
+        "Time": {
+                "Minute": "Minute",
+                "Minutes": "Minuten",
+                "Second": "Sekunde",
+                "Seconds": "Sekunden",
+                "MinutesAndSeconds": "{minutes} {minuteLabel} und {seconds} {secondLabel}",
+                "OnlySeconds": "{seconds} {secondLabel}"
+            },
+        "DONATION": {
+            "support": "Um meine Projekte zu unterstützen:"
+        },
+        "SETTINGS": {
+            "useTokenName": {
+                "name": "Charakternamen verwenden",
+                "hint": "Verwendet den Charakternamen anstelle des Spielernamens in Nachrichten"
+            },
+            "typewriter": {
+                "name": "Schreibmaschineneffekt",
+                "hint": "Aktiviert die progressive Textanzeige wie im Alien-Film",
+                "enable": "Aktivieren",
+                "disable": "Deaktivieren"
+            },
+            "commandsList": {
+                "name": "MU/TH/UR Befehlsliste",
+                "hint": "Vollständige Liste der verfügbaren Befehle für Spieler:",
+                "commands": "HELP: ZEIGT DIESE HILFE\nSTATUS: SYSTEMSTATUS\nCLEAR: BILDSCHIRM LÖSCHEN\nEXIT: TERMINAL SCHLIESSEN\nMOTHER [NACHRICHT]: MIT MUTHUR KOMMUNIZIEREN\nHACK: STARTET DEN HACK-BEFEHL FÜR ADMINISTRATORRECHTE\nSPECIAL ORDER: 754, 899, 931, 937, 939, 966, ZEIGT SPEZIELLE BEFEHLE\nCERBERUS PROTOCOL: BEFEHL ZUR EINLEITUNG DER SELBSTZERSTÖRUNG"
+            },
+            "hackResult": {
+                "name": "Hack-Ergebnis",
+                "hint": "Bestimmt, ob Hack-Versuche mit dem HACK-Befehl erfolgreich sind oder fehlschlagen",
+                "random": "Zufällig",
+                "success": "Immer erfolgreich",
+                "failure": "Immer fehlschlagen"
+            },
+            "typingSound": {
+                "name": "Tippgeräusche",
+                "hint": "Aktiviert Tastaturgeräusche wie im Alien-Film",
+                "enable": "Aktiviert",
+                "disable": "Deaktiviert"
+            },
+            "typingSoundVolume": {
+                "name": "Tippgeräusch-Lautstärke",
+                "hint": "Passt die Lautstärke der Tippgeräusche an (0 = stumm, 1 = maximum)"
+            },
+            "motherResponseColor": {
+                "name": "MOTHER Antwortfarbe",
+                "hint": "Legt die Farbe der MOTHER-Antwortnachrichten fest",
+                "orange": "Orange",
+                "green": "Grün",
+                "red": "Rot",
+                "white": "Weiß",
+                "blue": "Blau",
+                "yellow": "Gelb"
+            },
+            "scanline": {
+                "name": "Scanline-Effekt",
+                "hint": "Aktiviert den Lichtabtasteffekt vor der Textanzeige",
+                "enable": "Aktiviert",
+                "disable": "Deaktiviert"
+            },
+            "scanlineSize": {
+                "name": "Scanline-Größe",
+                "hint": "Legt die Größe des Lichtpunkts fest, der der Textanzeige vorausgeht (in Pixeln)"
+            },
+            "allowHack": {
+                "name": "Hacking erlauben",
+                "hint": "Erlaubt Spielern die Verwendung des HACK-Befehls für Administratorzugriff",
+                "enable": "Erlaubt",
+                "disable": "Nicht erlaubt"
+            },
+            "allowCerberus": {
+                "name": "Cerberus-Protokoll erlauben",
+                "hint": "Erlaubt Spielern die Aktivierung des Selbstzerstörungsprotokolls",
+                "enable": "Erlaubt",
+                "disable": "Nicht erlaubt"
+            },
+            "cerberusDuration": {
+                "name": "Cerberus-Protokoll Dauer",
+                "hint": "Dauer in Minuten bis zur Selbstzerstörung (1-60 Minuten)"
+            }
+        }
+    },
+    "MOTHER": {
+        "HackSuccess": "HACK ERFOLGREICH - ZUGRIFF GEWÄHRT",
+        "HackFailure": "HACK FEHLGESCHLAGEN - TERMINAL GESPERRT",
+        "AccessDenied": "!!! ZUGRIFF VERWEIGERT !!!\n\nUNZUREICHENDE AUTORISIERUNGSSTUFE\nADMINISTRATOR-IDENTIFIKATION ERFORDERLICH\n\nUNAUTORISIERTER ZUGRIFFSVERSUCH PROTOKOLLIERT\nFEHLERCODE: WY-SEC-451",
+        "HackAttempt": "Hack-Versuch läuft...",
+        "HackAlreadySuccessful": "ADMINISTRATORZUGRIFF BEREITS ERHALTEN - NEUER HACK-VERSUCH NICHT AUTORISIERT",
+        "HackDetected": "!!! HACK-VERSUCH ERKANNT !!! - {result}",
+        "Success": "ERFOLG",
+        "Failure": "FEHLGESCHLAGEN",
+        "CerberusHackAlert": "!!! PRIORITÄTSALARM !!! - {userName} HAT DAS CERBERUS-PROTOKOLL EINGELEITET",
+        "CerberusConfirmed": "CERBERUS-PROTOKOLL BESTÄTIGT - SELBSTZERSTÖRUNG LÄUFT",
+        "CerberusCancelled": "CERBERUS-PROTOKOLL ABGEBROCHEN",
+        "CommandNotFound": "BEFEHL NICHT ERKANNT. GEBEN SIE 'HELP' FÜR DIE BEFEHLSLISTE EIN.",
+        "IntrusionDetected": "!!! EINDRINGEN ERKANNT !!!",
+        "HackDisabledInfo": "Der HACK-Befehl ist derzeit in den Systemeinstellungen deaktiviert\nMöchten Sie ihn aktivieren?",
+        "EnableHack": "AKTIVIEREN",
+        "KeepDisabled": "DEAKTIVIERT LASSEN",
+        "HackEnabled": "HACK-BEFEHL AKTIVIERT\nSpieler können den Befehl jetzt verwenden",
+        "HackKeptDisabled": "HACK-BEFEHL BLEIBT DEAKTIVIERT",
+        "SecurityProtocol": "■ SICHERHEITSPROTOKOLL DELTA-7 AKTIVIERT ■",
+        "CountermeasuresAttempt": "VERSUCHE GEGENMASSNAHMEN...",
+        "CountermeasuresFailed": "!!! GEGENMASSNAHMEN FEHLGESCHLAGEN !!!",
+        "RootAccess": "ROOT-ZUGRIFF KOMPROMITTIERT",
+        "AdminPrivileges": ">>> ADMINISTRATORRECHTE GEWÄHRT",
+        "SecurityDisabled": "SICHERHEITSPROTOKOLLE DEAKTIVIERT",
+        "FullAccess": "VOLLZUGRIFF GEWÄHRT",
+        "WelcomeAdmin": "WILLKOMMEN ADMINISTRATOR",
+        "WelcomeAdminFull": "WILLKOMMEN ADMINISTRATOR\nWAS KANN ICH FÜR SIE TUN?",
+        "CountermeasuresActivated": "GEGENMASSNAHMEN AKTIVIERT",
+        "TerminalLocked": "!!! TERMINAL GESPERRT !!!",
+        "LocatingIntruder": "LOKALISIERE EINDRINGLING...",
+        "IPRecorded": "IP-KOORDINATEN AUFGEZEICHNET",
+        "AccessBlocked": "!!! ZUGRIFF BLOCKIERT !!!",
+        "TerminalLocked24": "TERMINAL FÜR 24 STUNDEN GESPERRT",
+        "ForcedDisconnect3": "ERZWUNGENE TRENNUNG IN 3...",
+        "ConnectionTerminated": "VERBINDUNG BEENDET",
+        "CerberusDisabled": "CERBERUS-PROTOKOLL VOM ADMINISTRATOR DEAKTIVIERT",
+        "CerberusActivated": "!!! CERBERUS-PROTOKOLL AKTIVIERT !!!",
+        "CerberusWarning": "!!! WARNUNG !!!\nCERBERUS-PROTOKOLL AKTIVIERT\nSELBSTZERSTÖRUNG EINGELEITET",
+        "CerberusCountdown": "VERBLEIBENDE ZEIT BIS ZUR DETONATION:",
+        "CerberusDetonation": "DETONATION",
+        "CerberusEvacuate": "SOFORTIGE EVAKUIERUNG ERFORDERLICH",
+        "Keywords": {
+            "Ordre": "ORDER",
+            "Special": "SPECIAL",
+            "Special2": "SPECIAL",
+            "Protocol": "PROTOCOL"
+        },
+        "SpecialOrders": {
+            "754": {
+                "name": "SPECIAL ORDER 754",
+                "description": "Notsignal untersuchen. Alle anderen Überlegungen nachrangig. Besatzung entbehrlich."
+            },
+            "899": {
+                "name": "SPECIAL ORDER 899",
+                "description": "Xenomorph-Proben für die Abteilung für biologische Waffen sammeln. Höchste Priorität. Besatzung entbehrlich."
+            },
+            "931": {
+                "name": "SPECIAL ORDER 931",
+                "description": "Biologische Kontamination eindämmen. Quarantäneprotokolle aktiviert. Keine Ausnahmen genehmigt."
+            },
+            "937": {
+                "name": "SPECIAL ORDER 937",
+                "description": "Schutz der Xenomorph-Proben hat Priorität. Besatzung entbehrlich."
+            },
+            "939": {
+                "name": "SPECIAL ORDER 939",
+                "description": "Lebensfähige Proben zur Analyse zurückbringen. Absolute Geheimhaltung erforderlich. Besatzung entbehrlich."
+            },
+            "966": {
+                "name": "SPECIAL ORDER 966",
+                "description": "Nicht-menschliche Artefakte sichern und bewahren. Höchste Priorität. Besatzung entbehrlich."
+            },
+            "Cerberus": {
+                "name": "CERBERUS PROTOCOL",
+                "TimeRemaining": "Sie haben noch {time} bis zur Aktivierung des CERBERUS-Protokolls.",
+                "description": "MAXIMALES SICHERHEITSPROTOKOLL AKTIVIERT\nSELBSTZERSTÖRUNG WIRD INITIALISIERT\nSOFORTIGE EVAKUIERUNG EMPFOHLEN\nVERBLEIBENDE ZEIT BIS ZUR DETONATION: 10:00\n\nWARNUNG: DIESE AKTION KANN NICHT RÜCKGÄNGIG GEMACHT WERDEN",
+                "warning": "!!! WARNUNG !!!\nCERBERUS-PROTOKOLL AKTIVIERT\nSELBSTZERSTÖRUNG EINGELEITET",
+                "confirmation": "!!! WARNUNG !!!\n\nSIE SIND DABEI, DAS CERBERUS-PROTOKOLL ZU AKTIVIEREN\nDIESE AKTION WIRD DIE SELBSTZERSTÖRUNG DER STATION AUSLÖSEN\nKEINE RÜCKKEHR WIRD MÖGLICH SEIN\n\nAKTIVIERUNG BESTÄTIGEN?",
+                "confirm": "BESTÄTIGEN",
+                "cancel": "ABBRECHEN",
+                "cancelled": "AKTIVIERUNG DES CERBERUS-PROTOKOLLS ABGEBROCHEN\nRÜCKKEHR ZUM NORMALBETRIEB",
+                "ProtocolActivated": "CERBERUS-PROTOKOLL AKTIVIERT",
+                "Status": "STATUS",
+                "Critical": "KRITISCH",
+                "SelfDestruct": "SELBSTZERSTÖRUNGSSEQUENZ EINGELEITET",
+                "Warning": "LETZTE WARNUNG",
+                "NoReturn": "DIESE AKTION IST UNUMKEHRBAR",
+                "EvacuateNow": "SOFORTIGE EVAKUIERUNG ERFORDERLICH",
+                "YouAreDead": "Sie sind tot",
+                "MissionFailed": "Mission fehlgeschlagen - Anlage zerstört",
+                "Stopped": "SIE HABEN ÜBERLEBT",
+                "goodbye": "VIEL GLÜCK"
+            }
+        }
+    }
+}

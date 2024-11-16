@@ -1,0 +1,201 @@
+{
+    "MUTHUR": {
+        "welcome": "MUTHUR 6000 v2.1.0\nTERMINAL AKTIV...\nGRENSESNITT 2037\nVENTER PÅ KOMMANDO...",
+        "waitingResponse": "VENTER PÅ SVAR...",
+        "help": "TILGJENGELIGE KOMMANDOER:\n- HELP: VIS DENNE HJELPEN\n- STATUS: SYSTEMSTATUS\n- CLEAR: TØME SKJERM\n- EXIT: LUKK TERMINAL\n- /M [MELDING]: KOMMUNISER MED MUTHUR\n \nVENTER PÅ KOMMANDO...",
+        "status": "MUTHUR 6000 v2.1.0\nALLE SYSTEMER FUNGERER\nINGEN AVVIK OPPDAGET",
+        "commandNotFound": "KOMMANDO IKKE GJENKJENT. SKRIV 'HELP' FOR KOMMANDOLISTE.",
+        "sessionEnded": "ØKTE AVSLUTTET",
+        "motherPrefix": "/M",
+        "sessionStarted": "ØKTE STARTET",
+        "newSessionStarted": "=== NY MUTHUR ØKTE STARTET ===\nHER ER TILGJENGELIGE KOMMANDOER FOR SPILLEREN:\nHELP: VIS DENNE HJELPEN\nSTATUS: SYSTEMSTATUS\nCLEAR: TØME SKJERM\nEXIT: LUKK TERMINAL\n/M [MELDING]: KOMMUNISER MED MUTHUR\nHACK: START HACK-KOMMANDO FOR ADMINISTRATORRETTIGHETER\nSPECIAL ORDER: 754, 899, 931, 937, 939, 966, VIS SPESIELLE ORDRER\nCERBERUS PROTOCOL: KOMMANDO FOR Å STARTE SELVDESTRUKSJON",
+        "muthurSessionEnded": "MUTHUR ØKTE AVSLUTTET",
+        "unknownCommand": "KOMMANDO IKKE GJENKJENT. SKRIV 'HELP' FOR KOMMANDOLISTE",
+        "skip": "HOPP OVER",
+        "send": "SVAR",
+        "sessionActiveWarning": "En MUTHUR økte er allerede aktiv med {userName}",
+        "sessionStartedBy": "{userName} har startet en MUTHUR økte",
+        "sessionEndedBy": "{userName} har avsluttet MUTHUR økten",
+        "systemReady": "MUTHUR 6000 system klar",
+        "inputPlaceholder": "Skriv inn en kommando",
+        "selectCharacter": "Velg Karakter",
+        "selectCharacterHint": "Velg karakteren som skal kommunisere med MUTHUR",
+        "Time": {
+                "Minute": "minutt",
+                "Minutes": "minutter",
+                "Second": "sekund",
+                "Seconds": "sekunder",
+                "MinutesAndSeconds": "{minutes} {minuteLabel} og {seconds} {secondLabel}",
+                "OnlySeconds": "{seconds} {secondLabel}"
+            },
+        "DONATION": {
+            "support": "For å støtte prosjektene mine:"
+        },
+        "SETTINGS": {
+            "useTokenName": {
+                "name": "Bruk Karakternavn",
+                "hint": "Bruk karakternavn i stedet for spillernavn i meldinger"
+            },
+            "typewriter": {
+                "name": "Skrivemaskineffekt",
+                "hint": "Aktiverer progressiv tekstvisning som i Alien-filmen",
+                "enable": "Aktiver",
+                "disable": "Deaktiver"
+            },
+            "commandsList": {
+                "name": "MU/TH/UR Kommandoliste",
+                "hint": "Fullstendig liste over tilgjengelige kommandoer for spillere:",
+                "commands": "HELP: VIS DENNE HJELPEN\nSTATUS: SYSTEMSTATUS\nCLEAR: TØME SKJERM\nEXIT: LUKK TERMINAL\nMOTHER [MELDING]: KOMMUNISER MED MUTHUR\nHACK: START HACK-KOMMANDO FOR ADMINISTRATORRETTIGHETER\nSPECIAL ORDER: 754, 899, 931, 937, 939, 966, VIS SPESIELLE ORDRER\nCERBERUS PROTOCOL: KOMMANDO FOR Å STARTE SELVDESTRUKSJON"
+            },
+            "hackResult": {
+                "name": "Hack Resultat",
+                "hint": "Bestemmer om hackforsøk med HACK-kommandoen lykkes eller mislykkes",
+                "random": "Tilfeldig",
+                "success": "Alltid Vellykket",
+                "failure": "Alltid Mislykket"
+            },
+            "typingSound": {
+                "name": "Skrivelyder",
+                "hint": "Aktiverer tastaturlyder som i Alien-filmen",
+                "enable": "Aktivert",
+                "disable": "Deaktivert"
+            },
+            "typingSoundVolume": {
+                "name": "Skrivelydvolum",
+                "hint": "Justerer volumet på skrivelydene (0 = stille, 1 = maksimum)"
+            },
+            "motherResponseColor": {
+                "name": "MOTHER Svarfarge",
+                "hint": "Setter fargen på MOTHERs svarmeldinger",
+                "orange": "Oransje",
+                "green": "Grønn",
+                "red": "Rød",
+                "white": "Hvit",
+                "blue": "Blå",
+                "yellow": "Gul"
+            },
+            "scanline": {
+                "name": "Scanline Effekt",
+                "hint": "Aktiverer lysscanning-effekten før tekstvisning",
+                "enable": "Aktivert",
+                "disable": "Deaktivert"
+            },
+            "scanlineSize": {
+                "name": "Scanline Størrelse",
+                "hint": "Setter størrelsen på lyspunktet som kommer før tekstvisning (i piksler)"
+            },
+            "allowHack": {
+                "name": "Tillat Hacking",
+                "hint": "Lar spillere bruke HACK-kommandoen for administratortilgang",
+                "enable": "Tillatt",
+                "disable": "Ikke Tillatt"
+            },
+            "allowCerberus": {
+                "name": "Tillat Cerberus Protokoll",
+                "hint": "Lar spillere aktivere selvdestruksjonsprotokollen",
+                "enable": "Tillatt",
+                "disable": "Ikke Tillatt"
+            },
+            "cerberusDuration": {
+                "name": "Cerberus Protokoll Varighet",
+                "hint": "Varighet i minutter før selvdestruksjon (1-60 minutter)"
+            }
+        }
+    },
+    "MOTHER": {
+        "HackSuccess": "HACK VELLYKKET - TILGANG INNVILGET",
+        "HackFailure": "HACK MISLYKKET - TERMINAL LÅST",
+        "AccessDenied": "!!! TILGANG NEKTET !!!\n\nUTILSTREKKELIG AUTORISASJONSNIVÅ\nADMINISTRATORIDENTIFIKASJON PÅKREVD\n\nUAUTORISERT TILGANGSFORSØK REGISTRERT\nFEILKODE: WY-SEC-451",
+        "HackAttempt": "Hackforsøk pågår...",
+        "HackAlreadySuccessful": "ADMINISTRATORTILGANG ALLEREDE OPPNÅDD - NYTT HACKFORSØK IKKE AUTORISERT",
+        "HackDetected": "!!! HACKFORSØK OPPDAGET !!! - {result}",
+        "Success": "VELLYKKET",
+        "Failure": "MISLYKKET",
+        "CerberusHackAlert": "!!! PRIORITETSALARM !!! - {userName} HAR INITIERT CERBERUS PROTOKOLLEN",
+        "CerberusConfirmed": "CERBERUS PROTOKOLL BEKREFTET - SELVDESTRUKSJON PÅGÅR",
+        "CerberusCancelled": "CERBERUS PROTOKOLL AVBRUTT",
+        "CommandNotFound": "KOMMANDO IKKE GJENKJENT. SKRIV 'HELP' FOR KOMMANDOLISTE.",
+        "IntrusionDetected": "!!! INNTRENGNING OPPDAGET !!!",
+        "HackDisabledInfo": "HACK-kommandoen er for tiden deaktivert i systeminnstillingene\nØnsker du å aktivere den?",
+        "EnableHack": "AKTIVER",
+        "KeepDisabled": "HOLD DEAKTIVERT",
+        "HackEnabled": "HACK-KOMMANDO AKTIVERT\nSpillere kan nå bruke kommandoen",
+        "HackKeptDisabled": "HACK-KOMMANDO FORBLIR DEAKTIVERT",
+        "SecurityProtocol": "■ SIKKERHETSPROTOKOLL DELTA-7 AKTIVERT ■",
+        "CountermeasuresAttempt": "FORSØKER MOTTILTAK...",
+        "CountermeasuresFailed": "!!! MOTTILTAK MISLYKKET !!!",
+        "RootAccess": "ROOT-TILGANG KOMPROMITTERT",
+        "AdminPrivileges": ">>> ADMINISTRATORRETTIGHETER INNVILGET",
+        "SecurityDisabled": "SIKKERHETSPROTOKOLLER DEAKTIVERT",
+        "FullAccess": "FULL TILGANG INNVILGET",
+        "WelcomeAdmin": "VELKOMMEN ADMINISTRATOR",
+        "WelcomeAdminFull": "VELKOMMEN ADMINISTRATOR\nHVA KAN JEG HJELPE DEG MED?",
+        "CountermeasuresActivated": "MOTTILTAK AKTIVERT",
+        "TerminalLocked": "!!! TERMINAL LÅST !!!",
+        "LocatingIntruder": "LOKALISERER INNTRENGER...",
+        "IPRecorded": "IP-KOORDINATER REGISTRERT",
+        "AccessBlocked": "!!! TILGANG BLOKKERT !!!",
+        "TerminalLocked24": "TERMINAL LÅST I 24 TIMER",
+        "ForcedDisconnect3": "TVUNGEN FRAKOBLING OM 3...",
+        "ConnectionTerminated": "TILKOBLING AVSLUTTET",
+        "CerberusDisabled": "CERBERUS PROTOKOLL DEAKTIVERT AV ADMINISTRATOR",
+        "CerberusActivated": "!!! CERBERUS PROTOKOLL AKTIVERT !!!",
+        "CerberusWarning": "!!! ADVARSEL !!!\nCERBERUS PROTOKOLL AKTIVERT\nSELVDESTRUKSJON INITIERT",
+        "CerberusCountdown": "GJENVÆRENDE TID TIL DETONASJON:",
+        "CerberusDetonation": "DETONASJON",
+        "CerberusEvacuate": "UMIDDELBAR EVAKUERING PÅKREVD",
+        "Keywords": {
+            "Ordre": "ORDER",
+            "Special": "SPECIAL",
+            "Special2": "SPECIAL",
+            "Protocol": "PROTOCOL"
+        },
+        "SpecialOrders": {
+            "754": {
+                "name": "SPECIAL ORDER 754",
+                "description": "Undersøk nødsignal. Alle andre hensyn sekundære. Mannskap erstattelig."
+            },
+            "899": {
+                "name": "SPECIAL ORDER 899",
+                "description": "Samle xenomorf-prøver for biologisk våpenavdeling. Maksimal prioritet. Mannskap erstattelig."
+            },
+            "931": {
+                "name": "SPECIAL ORDER 931",
+                "description": "Begrens biologisk kontaminering. Karanteneprotokoller aktivert. Ingen unntak tillatt."
+            },
+            "937": {
+                "name": "SPECIAL ORDER 937",
+                "description": "Beskyttelse av xenomorf-prøver prioritert. Mannskap erstattelig."
+            },
+            "939": {
+                "name": "SPECIAL ORDER 939",
+                "description": "Returner levedyktige prøver for analyse. Absolutt konfidensialitet påkrevd. Mannskap erstattelig."
+            },
+            "966": {
+                "name": "SPECIAL ORDER 966",
+                "description": "Sikre og bevare alle ikke-menneskelige artefakter. Maksimal prioritet. Mannskap erstattelig."
+            },
+            "Cerberus": {
+                "name": "CERBERUS PROTOCOL",
+                "TimeRemaining": "Du har {time} før CERBERUS protokoll aktivering.",
+                "description": "MAKSIMAL SIKKERHETSPROTOKOLL AKTIVERT\nSELVDESTRUKSJON INITIALISERING\nUMIDDELBAR EVAKUERING ANBEFALT\nGJENVÆRENDE TID TIL DETONASJON: 10:00\n\nADVARSEL: DENNE HANDLINGEN KAN IKKE ANGRES",
+                "warning": "!!! ADVARSEL !!!\nCERBERUS PROTOKOLL AKTIVERT\nSELVDESTRUKSJON INITIERT",
+                "confirmation": "!!! ADVARSEL !!!\n\nDU ER I FERD MED Å AKTIVERE CERBERUS PROTOKOLLEN\nDENNE HANDLINGEN VIL UTLØSE STASJONENS SELVDESTRUKSJON\nINGEN RETURMULIGHET\n\nBEKREFT AKTIVERING?",
+                "confirm": "BEKREFT",
+                "cancel": "AVBRYT",
+                "cancelled": "AKTIVERING AV CERBERUS PROTOKOLL AVBRUTT\nTILBAKE TIL NORMAL DRIFT",
+                "ProtocolActivated": "CERBERUS PROTOKOLL AKTIVERT",
+                "Status": "STATUS",
+                "Critical": "KRITISK",
+                "SelfDestruct": "SELVDESTRUKSJONSSEKVENS INITIERT",
+                "Warning": "SISTE ADVARSEL",
+                "NoReturn": "DENNE HANDLINGEN ER UGJENKALLELIG",
+                "EvacuateNow": "UMIDDELBAR EVAKUERING PÅKREVD",
+                "YouAreDead": "Du er død",
+                "MissionFailed": "Oppdrag mislykket - Installasjon ødelagt",
+                "Stopped": "DU HAR OVERLEVD",
+                "goodbye": "LYKKE TIL"
+            }
+        }
+    }
+}

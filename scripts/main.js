@@ -2285,6 +2285,7 @@ async function simulateHackingAttempt(chatLog) {
 
 
 
+
             // Garder l'effet rouge pour le message de bienvenue
             chatLog.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
 
@@ -2367,6 +2368,52 @@ async function simulateHackingAttempt(chatLog) {
             }, 5000);
         }
     }
+
+    // Nettoyage final
+    if (!isSuccess) {
+        // Nettoyer les fenêtres de hacking
+        if (typeof stopHackingWindows === 'function') {
+            stopHackingWindows();
+        }
+        
+        // Nettoyer les autres éléments
+        clearHackingElements();
+        
+        // Fermer la session après un délai
+        setTimeout(() => {
+            const muthurChat = document.getElementById('muthur-chat-container');
+            if (muthurChat) {
+                muthurChat.remove();
+            }
+            currentMuthurSession.active = false;
+            currentMuthurSession.userId = null;
+            currentMuthurSession.userName = null;
+        }, 5000);
+    }
+
+    // Informer le GM du résultat
+    if (!game.user.isGM) {
+        game.socket.emit('module.alien-mu-th-ur', {
+            type: 'hackComplete',
+            success: isSuccess,
+            fromId: game.user.id
+        });
+    }
+}
+
+// Ajouter cette nouvelle fonction pour nettoyer les éléments de hacking
+function clearHackingElements() {
+    // Nettoyer les fenêtres de hacking
+    const hackingWindows = document.querySelectorAll('.hacking-window');
+    hackingWindows.forEach(window => window.remove());
+    
+    // Nettoyer les styles de hacking
+    const hackingStyles = document.querySelectorAll('style[data-hacking]');
+    hackingStyles.forEach(style => style.remove());
+    
+    // Nettoyer les overlays
+    const overlays = document.querySelectorAll('.matrix-code, #muthur-glitch-overlay');
+    overlays.forEach(overlay => overlay.remove());
 }
 
 async function handleSpecialOrder(chatLog, command) {
@@ -2954,7 +3001,6 @@ function createCerberusWindow() {
     let currentY;
     let initialX;
     let initialY;
-
 
 
 

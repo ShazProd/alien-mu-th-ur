@@ -100,7 +100,14 @@
                 "name": "Cerberus Protocol Duur",
                 "hint": "Duur in minuten voor zelfvernietiging (1-60 minuten)"
             }
-        }
+        },
+        "motherName": "MOEDER",
+        "HackAttemptMessage": "{user} heeft geprobeerd het HACK commando te gebruiken (momenteel uitgeschakeld)",
+        "SpecialOrderAttempt": "Poging tot toegang speciale order: {command}",
+        "HackDetectionMessage": "!!! HACKPOGING GEDETECTEERD DOOR {userName} !!! - {result}",
+        "HackSuccess": "GESLAAGD",
+        "HackFailure": "MISLUKT",
+        "HackInProgress": "HACKPOGING IN UITVOERING"
     },
     "MOTHER": {
         "HackSuccess": "HACK SUCCESVOL - TOEGANG VERLEEND",
@@ -194,7 +201,8 @@
                 "YouAreDead": "Je bent dood",
                 "MissionFailed": "Missie mislukt - Installatie vernietigd",
                 "Stopped": "JE HEBT HET OVERLEEFD",
-                "goodbye": "SUCCES"
+                "goodbye": "SUCCES",
+                "StopCerberus": "Stop Cerberus"
             }
         }
     }

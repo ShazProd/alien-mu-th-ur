@@ -100,7 +100,14 @@
                 "name": "Durata Protocollo Cerberus",
                 "hint": "Durata in minuti prima dell'autodistruzione (1-60 minuti)"
             }
-        }
+        },
+        "motherName": "MADRE",
+        "HackAttemptMessage": "{user} ha tentato di utilizzare il comando HACK (attualmente disabilitato)",
+        "SpecialOrderAttempt": "Tentativo di accesso all'ordine speciale: {command}",
+        "HackDetectionMessage": "!!! TENTATIVO DI HACKING RILEVATO DA {userName} !!! - {result}",
+        "HackSuccess": "SUCCESSO",
+        "HackFailure": "FALLIMENTO",
+        "HackInProgress": "TENTATIVO DI HACKING IN CORSO"
     },
     "MOTHER": {
         "HackSuccess": "HACK RIUSCITO - ACCESSO CONCESSO",
@@ -194,7 +201,8 @@
                 "YouAreDead": "Sei morto",
                 "MissionFailed": "Missione fallita - Installazione distrutta",
                 "Stopped": "SEI SOPRAVVISSUTO",
-                "goodbye": "BUONA FORTUNA"
+                "goodbye": "BUONA FORTUNA",
+                "StopCerberus": "Fermare Cerberus"
             }
         }
     }

@@ -100,7 +100,14 @@
                 "name": "Cerberus Protokol Varighed",
                 "hint": "Varighed i minutter før selvdestruktion (1-60 minutter)"
             }
-        }
+        },
+        "motherName": "MOR",
+        "HackAttemptMessage": "{user} forsøgte at bruge HACK kommandoen (aktuelt deaktiveret)",
+        "SpecialOrderAttempt": "Forsøg på adgang til specialordre: {command}",
+        "HackDetectionMessage": "!!! HACKINGFORSØG OPDAGET AF {userName} !!! - {result}",
+        "HackSuccess": "SUCCES",
+        "HackFailure": "FEJL",
+        "HackInProgress": "HACKINGFORSØG I GANG"
     },
     "MOTHER": {
         "HackSuccess": "HACK LYKKEDES - ADGANG BEVILGET",
@@ -194,7 +201,8 @@
                 "YouAreDead": "Du er død",
                 "MissionFailed": "Mission mislykket - Installation ødelagt",
                 "Stopped": "DU HAR OVERLEVET",
-                "goodbye": "HELD OG LYKKE"
+                "goodbye": "HELD OG LYKKE",
+                "StopCerberus": "Stop Cerberus"
             }
         }
     }

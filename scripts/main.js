@@ -115,7 +115,7 @@ async function showBootSequence() {
 ██     ██ ███████ ██    ██ ██       █████  ███    ██ ██████      ██    ██ ██    ██ ████████  █████  ███    ██ ██ 
 ██     ██ ██       ██  ██  ██      ██   ██ ████   ██ ██   ██      ██  ██  ██    ██    ██    ██   ██ ████   ██ ██ 
 ██  █  ██ █████     ████   ██      ███████ ██ ██  ██ ██   ██       ████   ██    ██    ██    ███████ ██ ██  ██ ██ 
-██ ███ ██ ██         ██    ██      ██   ██ ██  ██ ██ ██   ██        ██    ██    ██    ██    ██   ██ ██  ██ ██ ██ 
+██ ███ ██ ██         ██    ██      ██   ██ ██  ██ ██ ██   ██        ██    ██    ██    ██    ██   ██ ██ ██  ██ ██
  ███ ███  ███████    ██    ███████ ██   ██ ██   ████ ██████         ██     ██████     ██    ██   ██ ██   ████ ██ 
     </pre>
 `;
@@ -1037,7 +1037,7 @@ function showMuthurInterface() {
 
                     // Envoyer la tentative au GM
                     if (!game.user.isGM) {
-                        sendToGM(`Tentative d'accès ordre spécial: ${command}`);
+                        sendToGM(game.i18n.format("MUTHUR.SpecialOrderAttempt", { command: command }));
                     }
 
                     if (game.settings.get('alien-mu-th-ur', 'enableTypingSounds')) {
@@ -1408,7 +1408,8 @@ async function handleGMResponse(data) {
     const response = data.command.toUpperCase();
 
     // Utiliser la couleur envoyée par le GM
-    const messageDiv = await displayMuthurMessage(chatLog, response, 'MAMAN: ', data.color || '#ff9900', 'reply');
+    const motherName = game.i18n.localize("MUTHUR.motherName");
+    const messageDiv = await displayMuthurMessage(chatLog, response, `${motherName}: `, data.color || '#ff9900', 'reply');
     messageDiv.classList.add('maman-message');
 
     chatLog.scrollTop = chatLog.scrollHeight;
@@ -1436,7 +1437,7 @@ async function handleMuthurResponse(data) {
     if (data.actionType === 'hack') {
         await displayMuthurMessage(
             chatLog,
-            `${data.user} a tenté d'utiliser la commande HACK (actuellement désactivée)`,
+            game.i18n.format("MUTHUR.HackAttemptMessage", { user: data.user }),
             '',
             '#ff9900',
             'error'
@@ -1762,7 +1763,7 @@ function sendGMResponse(targetUserId, message, color = '#ff9900') {
         const gmChatLog = document.querySelector('.gm-chat-log');
         if (gmChatLog) {
             const messageDiv = document.createElement('div');
-            messageDiv.textContent = `MAMAN: ${message}`;
+            messageDiv.textContent = `${game.i18n.localize("MUTHUR.motherName")}: ${message}`;
             messageDiv.style.color = color;
             gmChatLog.appendChild(messageDiv);
             gmChatLog.scrollTop = gmChatLog.scrollHeight;
@@ -2286,6 +2287,8 @@ async function simulateHackingAttempt(chatLog) {
 
 
 
+
+
             // Garder l'effet rouge pour le message de bienvenue
             chatLog.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
 
@@ -2329,7 +2332,10 @@ async function simulateHackingAttempt(chatLog) {
         // Envoyer le message de détection
         game.socket.emit('module.alien-mu-th-ur', {
             type: 'muthurCommand',
-            command: `!!! TENTATIVE DE HACKING DÉTECTÉE PAR ${game.user.name} !!! - ${isSuccess ? 'SUCCÈS' : 'ÉCHEC'}`,
+            command: game.i18n.format("MUTHUR.HackDetectionMessage", {
+                userName: game.user.name,
+                result: isSuccess ? game.i18n.localize("MUTHUR.HackSuccess") : game.i18n.localize("MUTHUR.HackFailure")
+            }),
             user: game.user.name,
             userId: game.user.id,
             timestamp: Date.now()
@@ -2987,7 +2993,7 @@ function createCerberusWindow() {
                         text-transform: uppercase;
                         font-weight: bold;
                         text-shadow: 0 0 5px #ff0000;
-                    ">Arrêter Cerberus</button>
+                    ">${game.i18n.localize("MOTHER.SpecialOrders.Cerberus.StopCerberus")}</button>
                 </div>
             ` : ''}
         </div>
@@ -3204,7 +3210,7 @@ function displayGMHackProgress(chatLog) {
     `;
 
     const progressText = document.createElement('div');
-    progressText.textContent = 'TENTATIVE DE HACK EN COURS';
+    progressText.textContent = game.i18n.localize("MUTHUR.HackInProgress");
     progressText.style.zIndex = '1';
 
     const spinner = document.createElement('div');

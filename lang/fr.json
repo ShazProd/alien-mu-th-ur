@@ -100,7 +100,14 @@
                 "name": "Durée du protocole Cerberus",
                 "hint": "Durée en minutes avant l'auto-destruction (1-60 minutes)"
             }
-        }
+        },
+        "motherName": "MAMAN",
+        "HackAttemptMessage": "{user} a tenté d'utiliser la commande HACK (actuellement désactivée)",
+        "SpecialOrderAttempt": "Tentative d'accès ordre spécial : {command}",
+        "HackDetectionMessage": "!!! TENTATIVE DE HACKING DÉTECTÉE PAR {userName} !!! - {result}",
+        "HackSuccess": "SUCCÈS",
+        "HackFailure": "ÉCHEC",
+        "HackInProgress": "TENTATIVE DE HACK EN COURS"
     },
     "MOTHER": {
         "HackSuccess": "HACK RÉUSSI - ACCÈS ACCORDÉ",
@@ -137,7 +144,7 @@
         "AccessBlocked": "!!! ACCÈS BLOQUÉ !!!",
         "TerminalLocked24": "TERMINAL VERROUILLÉ POUR 24 HEURES",
         "ForcedDisconnect3": "DÉCONNEXION FORCÉE DANS 3...",
-        "ConnectionTerminated": "CONNECTION TERMINATED",
+        "ConnectionTerminated": "CONNECTION TERMINÉE",
         "CerberusDisabled": "PROTOCOLE CERBERUS DÉSACTIVÉ PAR L'ADMINISTRATEUR",
         "CerberusActivated": "!!! PROTOCOLE CERBERUS ACTIVÉ !!!",
         "CerberusWarning": "!!! ATTENTION !!!\nPROTOCOLE CERBERUS ACTIVÉ\nAUTO-DESTRUCTION INITIÉE",
@@ -194,7 +201,8 @@
                 "YouAreDead": "Vous êtes mort",
                 "MissionFailed": "Mission échouée - Installation détruite",
                 "Stopped": "VOUS AVEZ SURVÉCUE",
-                "goodbye": "BONNE CHANCE"
+                "goodbye": "BONNE CHANCE",
+                "StopCerberus": "Arrêter Cerberus"
             }
         }
     }

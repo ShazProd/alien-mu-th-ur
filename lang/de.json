@@ -100,7 +100,14 @@
                 "name": "Cerberus-Protokoll Dauer",
                 "hint": "Dauer in Minuten bis zur Selbstzerstörung (1-60 Minuten)"
             }
-        }
+        },
+        "motherName": "MUTTER",
+        "HackAttemptMessage": "{user} hat versucht, den HACK-Befehl zu verwenden (derzeit deaktiviert)",
+        "SpecialOrderAttempt": "Zugriffsversuch auf Spezialbefehl: {command}",
+        "HackDetectionMessage": "!!! HACKVERSUCH ERKANNT VON {userName} !!! - {result}",
+        "HackSuccess": "ERFOLG",
+        "HackFailure": "FEHLGESCHLAGEN",
+        "HackInProgress": "HACKVERSUCH LÄUFT"
     },
     "MOTHER": {
         "HackSuccess": "HACK ERFOLGREICH - ZUGRIFF GEWÄHRT",
@@ -194,7 +201,8 @@
                 "YouAreDead": "Sie sind tot",
                 "MissionFailed": "Mission fehlgeschlagen - Anlage zerstört",
                 "Stopped": "SIE HABEN ÜBERLEBT",
-                "goodbye": "VIEL GLÜCK"
+                "goodbye": "VIEL GLÜCK",
+                "StopCerberus": "Cerberus Stoppen"
             }
         }
     }

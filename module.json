@@ -2,7 +2,7 @@
   "id": "alien-mu-th-ur",
   "title": "Alien-Mu-Th-Ur",
   "description": "Module MU/TH/UR 6000 pour Alien RPG",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "compatibility": {
     "minimum": "12",
     "verified": "12"

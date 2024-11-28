@@ -100,7 +100,14 @@
                 "name": "Cerberus Protokoll Varaktighet",
                 "hint": "Varaktighet i minuter före självförstörelse (1-60 minuter)"
             }
-        }
+        },
+        "motherName": "MODER",
+        "HackAttemptMessage": "{user} försökte använda HACK-kommandot (för närvarande inaktiverat)",
+        "SpecialOrderAttempt": "Försök till åtkomst av specialorder: {command}",
+        "HackDetectionMessage": "!!! HACKNINGSFÖRSÖK UPPTÄCKT AV {userName} !!! - {result}",
+        "HackSuccess": "LYCKADES",
+        "HackFailure": "MISSLYCKADES",
+        "HackInProgress": "HACKNINGSFÖRSÖK PÅGÅR"
     },
     "MOTHER": {
         "HackSuccess": "HACK LYCKADES - ÅTKOMST BEVILJAD",
@@ -194,7 +201,8 @@
                 "YouAreDead": "Du är död",
                 "MissionFailed": "Uppdrag misslyckat - Installation förstörd",
                 "Stopped": "DU HAR ÖVERLEVT",
-                "goodbye": "LYCKA TILL"
+                "goodbye": "LYCKA TILL",
+                "StopCerberus": "Stoppa Cerberus"
             }
         }
     }

@@ -494,8 +494,7 @@ const glitchEffect = async () => {
 };
 
 // Fonction d'envoi modifiée
-function sendToGM(message, actionType = 'command') {
-
+function sendToGM(message, actionType = 'command', commandType = '') {
 
     if (!game.socket) {
         console.error("Socket non disponible!");
@@ -510,6 +509,7 @@ function sendToGM(message, actionType = 'command') {
             user: game.user.name,
             userId: game.user.id,
             actionType: actionType,
+            commandType: commandType, // Ajout du type de commande
             timestamp: Date.now() // Ajout d'un timestamp pour le suivi
         });
 
@@ -1059,15 +1059,25 @@ function showMuthurInterface() {
                 chatLog.scrollTop = chatLog.scrollHeight;
 
                 if (!game.user.isGM) {
-                    sendToGM(message);
+                    // Spécifier que c'est une commande /m
+                    sendToGM(message, 'command', 'm');
                 }
                 return;
-            } else if (!game.user.isGM) {
-                sendToGM(command);
             }
 
             // Délai avant la réponse
             await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Liste des commandes reconnues
+            const knownCommands = ['HACK', 'HELP', 'STATUS', 'CLEAR', 'EXIT'];
+
+            // Vérifier si la commande est reconnue
+            const isKnownCommand = knownCommands.includes(command);
+
+            // Si c'est un joueur et que la commande n'est pas reconnue, envoyer au MJ comme commande inconnue
+            if (!game.user.isGM && !isKnownCommand && !command.startsWith(motherPrefix)) {
+                sendToGM(command, 'command', 'unknown');
+            }
 
             switch (command) {
                 case 'HACK':
@@ -1091,9 +1101,17 @@ function showMuthurInterface() {
                     break;
                 case 'HELP':
                     await displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.help"), '', '#00ff00', 'reply');
+                    // Si c'est un joueur, envoyer au MJ comme commande valide
+                    if (!game.user.isGM) {
+                        sendToGM(command, 'command', 'valid');
+                    }
                     break;
                 case 'STATUS':
                     await displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.status"), '', '#00ff00', 'reply');
+                    // Si c'est un joueur, envoyer au MJ comme commande valide
+                    if (!game.user.isGM) {
+                        sendToGM(command, 'command', 'valid');
+                    }
                     break;
                 case 'CLEAR':
                     chatLog.innerHTML = '';
@@ -1101,6 +1119,10 @@ function showMuthurInterface() {
                         await displayMuthurMessage(chatLog, game.i18n.localize("MOTHER.WelcomeAdminFull"), '', '#00ff00', 'reply');
                     } else {
                         await displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.welcome"), '', '#00ff00', 'reply');
+                    }
+                    // Si c'est un joueur, envoyer au MJ comme commande valide
+                    if (!game.user.isGM) {
+                        sendToGM(command, 'command', 'valid');
                     }
                     break;
                 case 'EXIT':
@@ -1480,7 +1502,20 @@ async function handleMuthurResponse(data) {
     }
 
     // Gestion normale des autres messages
-    await displayMuthurMessage(chatLog, `${data.user}: ${data.command}`, '', '#ff9900');
+    // Faire la distinction entre les différents types de commandes
+    if (data.commandType === 'm') {
+        // Si c'est une commande /m, afficher le préfixe /m
+        await displayMuthurMessage(chatLog, `${data.user}: ${game.i18n.localize("MUTHUR.motherPrefix")} ${data.command}`, '', '#ff9900');
+    } else if (data.commandType === 'unknown') {
+        // Si c'est une commande inconnue, afficher "COMMANDE INCONNUE"
+        await displayMuthurMessage(chatLog, `${data.user}: ${game.i18n.localize("MUTHUR.unknownCommandPrefix")} ${data.command}`, '', '#ff9900');
+    } else if (data.commandType === 'valid') {
+        // Si c'est une commande valide, afficher sans préfixe spécial
+        await displayMuthurMessage(chatLog, `${data.user}: ${data.command}`, '', '#ff9900');
+    } else {
+        // Pour tout autre type, afficher sans préfixe spécial
+        await displayMuthurMessage(chatLog, `${data.user}: ${data.command}`, '', '#ff9900');
+    }
 
     // Gestion des actions spéciales
     if (data.actionType === 'open') {

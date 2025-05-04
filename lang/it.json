@@ -21,6 +21,8 @@
         "inputPlaceholder": "Inserisci un comando",
         "selectCharacter": "Seleziona Personaggio",
         "selectCharacterHint": "Scegli il personaggio che comunicherà con MUTHUR",
+        "gmInterfaceTitle": "MUTHUR - {userName}",
+        "sessionClosedByGM": "MJ ha chiuso la sessione MUTHUR",
         "Time": {
                 "Minute": "minuto",
                 "Minutes": "minuti",

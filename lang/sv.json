@@ -21,6 +21,8 @@
         "inputPlaceholder": "Ange ett kommando",
         "selectCharacter": "Välj Karaktär",
         "selectCharacterHint": "Välj karaktären som ska kommunicera med MUTHUR",
+        "gmInterfaceTitle": "MUTHUR - {userName}",
+        "sessionClosedByGM": "GM har avslutat MUTHUR sessionen",
         "Time": {
                 "Minute": "minut",
                 "Minutes": "minuter",

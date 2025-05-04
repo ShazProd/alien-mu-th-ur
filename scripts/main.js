@@ -1285,6 +1285,58 @@ function createGMMuthurInterface(userName, userId) {
         display: flex;
         flex-direction: column;
     `;
+    
+    // Ajout d'un header avec bouton de fermeture pour l'interface GM
+    const headerContainer = document.createElement('div');
+    headerContainer.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    `;
+    
+    const headerTitle = document.createElement('div');
+    headerTitle.textContent = game.i18n.format("MUTHUR.gmInterfaceTitle", { userName: userName });
+    headerTitle.style.cssText = `
+        color: #ff9900;
+        font-weight: bold;
+        font-family: monospace;
+        font-size: 16px;
+    `;
+    
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = '&#10006;'; // Symbole X
+    closeButton.style.cssText = `
+        background: black;
+        border: 1px solid #ff9900;
+        color: #ff9900;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-family: monospace;
+        padding: 0;
+        line-height: 1;
+    `;
+    
+    closeButton.addEventListener('click', () => {
+        // Fermer l'interface GM
+        if (document.body.contains(container)) {
+            document.body.removeChild(container);
+        }
+        
+        // Envoyer un signal pour fermer l'interface du joueur
+        game.socket.emit('module.alien-mu-th-ur', {
+            type: 'closePlayerInterface',
+            targetUserId: userId
+        });
+    });
+    
+    headerContainer.appendChild(headerTitle);
+    headerContainer.appendChild(closeButton);
+    container.appendChild(headerContainer);
 
     // Création de la zone de chat
     const chatLog = document.createElement('div');
@@ -1615,6 +1667,16 @@ Hooks.once('ready', async () => {
             handleMuthurResponse(data);
         } else if (data.type === 'muthurResponse' && !game.user.isGM) {
             handleGMResponse(data);
+        } else if (data.type === 'closePlayerInterface' && !game.user.isGM && data.targetUserId === game.user.id) {
+            // Fermer l'interface du joueur si le GM a fermé la sienne
+            const chatContainer = document.getElementById('muthur-chat-container');
+            if (chatContainer && document.body.contains(chatContainer)) {
+                document.body.removeChild(chatContainer);
+                currentMuthurSession.active = false;
+                currentMuthurSession.userId = null;
+                currentMuthurSession.userName = null;
+                ui.notifications.info(game.i18n.localize("MUTHUR.sessionClosedByGM"));
+            }
         } else if (data.type === 'hackProgress' && game.user.isGM) {
             const gmChatLog = document.querySelector('.gm-chat-log');
             if (gmChatLog) {

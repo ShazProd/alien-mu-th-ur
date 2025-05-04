@@ -21,6 +21,8 @@
         "inputPlaceholder": "Voer een commando in",
         "selectCharacter": "Selecteer Karakter",
         "selectCharacterHint": "Kies het karakter dat met MUTHUR zal communiceren",
+        "gmInterfaceTitle": "MUTHUR - {userName}",
+        "sessionClosedByGM": "GM heeft de MUTHUR sessie beëindigd",
         "Time": {
                 "Minute": "minuut",
                 "Minutes": "minuten",

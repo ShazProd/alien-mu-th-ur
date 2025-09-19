@@ -16,7 +16,7 @@ let currentGMProgress = null;
 // Après les variables globales
 
 
-async function showBootSequence() {
+async function showBootSequence(isSpectator = false) {
     // Créer le conteneur principal
     const bootContainer = document.createElement('div');
     bootContainer.id = 'muthur-boot-sequence';
@@ -288,10 +288,14 @@ async function showBootSequence() {
                         duration: 0.3,
                         onComplete: () => {
                             bootContainer.remove();
-                            showMuthurInterface();
-                            // Envoyer un message au GM pour ouvrir son interface
                             if (!game.user.isGM) {
-                                sendToGM(game.i18n.localize("MUTHUR.sessionStarted"), 'open');
+                                if (!isSpectator) {
+                                    sendToGM(game.i18n.localize("MUTHUR.sessionStarted"), 'open');
+                                    showMuthurInterface();
+                                } else {
+                                    // Si c'est un spectateur, on attend que l'interface du joueur actif soit ouverte
+                                    // pour recevoir les messages via les sockets
+                                }
                             }
                         }
                     });
@@ -741,23 +745,38 @@ async function typeWriterEffect(element, text, speed = 30) {
         for (let j = 0; j < 3; j++) {
             const randomChar = chars[Math.floor(Math.random() * chars.length)];
             element.textContent = currentText + randomChar;
-
-
-
             await new Promise(resolve => setTimeout(resolve, speed / 3));
         }
 
         // Ajoute la vraie lettre au texte courant
         currentText += text[i];
         element.textContent = currentText;
-
-
-
         await new Promise(resolve => setTimeout(resolve, speed));
     }
 }
 
+// Fonction pour mettre à jour les interfaces spectateurs avec un nouveau message
+function updateSpectatorsWithMessage(text, prefix = '', color = '#00ff00', messageType = 'normal') {
+    // Envoyer le message à tous les spectateurs via le socket
+    game.socket.emit('module.alien-mu-th-ur', {
+        type: 'updateSpectators',
+        text: text,
+        prefix: prefix,
+        color: color,
+        messageType: messageType
+    });
+}
+
 // Modifier la fonction qui affiche les messages
+async function syncMessageToSpectators(chatLog, message, prefix = '', color = '#00ff00', messageType = 'normal') {
+    // Afficher le message dans le chat local
+    const messageElement = displayMuthurMessage(chatLog, message, prefix, color, messageType);
+    
+    // Mettre à jour les interfaces spectateurs avec le même message
+    updateSpectatorsWithMessage(message, prefix, color, messageType);
+    
+    return messageElement;
+}
 
 async function displayMuthurMessage(chatLog, text, prefix = '', color = '#00ff00', messageType = 'normal') {
     const messageDiv = document.createElement('div');
@@ -927,6 +946,7 @@ function showMuthurInterface() {
         display: flex;
         gap: 5px;
         width: 100%;
+        align-items: center;
     `;
 
     const input = document.createElement('input');
@@ -937,24 +957,23 @@ function showMuthurInterface() {
         background: black;
         border: 1px solid #00ff00;
         color: #00ff00;
-        padding: 5px;
+        padding: 4px 6px;
         font-family: monospace;
+        height: 24px;
     `;
 
     const sendButton = document.createElement('button');
-    sendButton.textContent = game.i18n.localize("MUTHUR.send");
+    sendButton.className = 'muthur-enter-btn';
+    sendButton.innerHTML = '<i class="fas fa-level-down-alt" style="transform: rotate(90deg);"></i>';
+    sendButton.title = game.i18n.localize("MUTHUR.send");
     sendButton.style.cssText = `
         background: black;
         border: 1px solid #00ff00;
         color: #00ff00;
-        padding: 5px;
         cursor: pointer;
         font-family: monospace;
         height: 24px;
-        line-height: 14px;
-        font-size: 12px;
-        min-width: 50px;
-        width: 110px;
+        width: 32px;
     `;
 
     inputContainer.appendChild(input);
@@ -965,7 +984,7 @@ function showMuthurInterface() {
     document.body.appendChild(chatContainer);
 
     // Afficher le message de bienvenue
-    displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.welcome"), '', '#00ff00', 'reply');
+    syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.welcome"), '', '#00ff00', 'reply');
 
 
     // Gestionnaire d'événements pour l'entrée
@@ -974,7 +993,7 @@ function showMuthurInterface() {
         if (input.value.trim()) {
             const command = input.value.trim().toUpperCase();
             input.value = '';
-            await displayMuthurMessage(chatLog, command, '> ');
+            await syncMessageToSpectators(chatLog, command, '> ');
             chatLog.scrollTop = chatLog.scrollHeight;
 
             const motherPrefix = "/M";
@@ -1027,7 +1046,7 @@ function showMuthurInterface() {
             // Dans showMuthurInterface, dans handleCommand
             if (isSpecialOrder(command) || isCerberus(command)) {
                 if (!hackSuccessful) {
-                    await displayMuthurMessage(
+                    await syncMessageToSpectators(
                         chatLog,
                         game.i18n.localize('MOTHER.AccessDenied'),
                         '',
@@ -1055,7 +1074,7 @@ function showMuthurInterface() {
             if (command.startsWith(motherPrefix)) {
 
                 const message = command.substring(motherPrefix.length).trim();
-                await displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.waitingResponse"), '', '#00ff00', 'communication');
+                await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.waitingResponse"), '', '#00ff00', 'communication');
                 chatLog.scrollTop = chatLog.scrollHeight;
 
                 if (!game.user.isGM) {
@@ -1175,6 +1194,77 @@ function showMuthurInterface() {
     return chatContainer;
 }
 
+// Fonction pour afficher un message d'attente pendant que le GM sélectionne les spectateurs
+function showWaitingMessage() {
+    // Vérifier si un message d'attente existe déjà
+    let waitingContainer = document.getElementById('muthur-waiting-container');
+    if (waitingContainer) {
+        return waitingContainer;
+    }
+    
+    // Créer le conteneur du message d'attente
+    waitingContainer = document.createElement('div');
+    waitingContainer.id = 'muthur-waiting-container';
+    waitingContainer.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: black;
+        border: 2px solid #00ff00;
+        padding: 20px;
+        z-index: 100000;
+        text-align: center;
+        font-family: monospace;
+        min-width: 400px;
+    `;
+    
+    // Ajouter le titre
+    const title = document.createElement('h2');
+    title.textContent = "MU/TH/UR 6000";
+    title.style.cssText = `
+        color: #00ff00;
+        margin-top: 0;
+        font-family: monospace;
+    `;
+    waitingContainer.appendChild(title);
+    
+    // Ajouter le message d'attente
+    const message = document.createElement('p');
+    message.textContent = game.i18n.localize("MUTHUR.waitingForGM");
+    message.style.cssText = `
+        color: #00ff00;
+        font-family: monospace;
+        margin-bottom: 20px;
+    `;
+    waitingContainer.appendChild(message);
+    
+    // Ajouter un indicateur de chargement (points clignotants)
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.style.cssText = `
+        color: #00ff00;
+        font-size: 24px;
+        font-family: monospace;
+    `;
+    loadingIndicator.textContent = ".";
+    waitingContainer.appendChild(loadingIndicator);
+    
+    // Animation des points clignotants
+    let dots = 1;
+    const loadingInterval = setInterval(() => {
+        dots = (dots % 3) + 1;
+        loadingIndicator.textContent = ".".repeat(dots);
+    }, 500);
+    
+    // Stocker l'intervalle dans un attribut pour pouvoir le nettoyer plus tard
+    waitingContainer.dataset.intervalId = loadingInterval;
+    
+    // Ajouter au document
+    document.body.appendChild(waitingContainer);
+    
+    return waitingContainer;
+}
+
 function toggleMuthurChat() {
     let chatContainer = document.getElementById('muthur-chat-container');
 
@@ -1207,8 +1297,32 @@ function toggleMuthurChat() {
     if (game.user.isGM) {
         showMuthurInterface();
     } else {
+        // Afficher un message d'attente pendant que le GM sélectionne les spectateurs
+        showWaitingMessage();
+        
+        // Mettre à jour l'état de la session
+        currentMuthurSession.active = true;
+        currentMuthurSession.userId = game.user.id;
+        currentMuthurSession.userName = game.user.name;
+        
+        // Informer le GM qu'un joueur a lancé MU/TH/UR et attendre sa sélection de spectateurs
+        game.socket.emit('module.alien-mu-th-ur', {
+            type: 'requestSpectatorSelection',
+            userId: game.user.id,
+            userName: game.user.name
+        });
+        
+        // Afficher un message d'attente au joueur
+        ui.notifications.info(game.i18n.localize("MUTHUR.waitingForGM"));
+        return;
+    }
 
-        showBootSequence();
+    // Différencier le comportement GM/Joueur
+    if (game.user.isGM) {
+        showMuthurInterface();
+    } else {
+
+        // La séquence de démarrage sera lancée après la sélection des spectateurs par le GM
         // const videoContainer = document.createElement('div');
         // videoContainer.style.cssText = `
         //     position: fixed;
@@ -1360,38 +1474,18 @@ function createGMMuthurInterface(userName, userId) {
         margin-top: 5px;
     `;
 
-    // Dans la fonction createGMMuthurInterface, modifiez la partie du colorSelect
-    const colorSelect = document.createElement('select');
-    colorSelect.style.cssText = `
-    background: black;
-    border: 1px solid #ff9900;
-    color: #ff9900;
-    padding: 2px;
-    font-family: monospace;
-    height: 24px;
-    width: 80px;
-`;
-
-    // Ajouter des styles personnalisés pour le select
+    // Styles pour la liste déroulante de couleurs et le bouton Enter
     const styleSheet = document.createElement('style');
     styleSheet.textContent = `
-    select {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FF9900%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-        background-repeat: no-repeat;
-        background-position: right 0.7em top 50%;
-        background-size: 0.65em auto;
-        padding-right: 1.4em;
-    }
-    select::-ms-expand {
-        display: none;
-    }
-    select option {
-        background: black;
-        color: #ff9900;
-    }
+    .muthur-color-dropdown { position: relative; display: inline-block; }
+    .muthur-color-toggle { width: 28px; height: 24px; border: 1px solid #ff9900; background: #ff9900; cursor: pointer; padding: 0; }
+    .muthur-color-menu { position: absolute; left: 0; bottom: 28px; background: #000; border: 1px solid #ff9900; padding: 6px; display: none; grid-template-columns: repeat(6, 20px); gap: 6px; z-index: 100002; }
+    .muthur-color-dropdown.open .muthur-color-menu { display: grid; }
+    .muthur-color-swatch { width: 20px; height: 20px; border: 1px solid #ff9900; cursor: pointer; padding: 0; background: transparent; display: inline-flex; align-items: center; justify-content: center; }
+    .muthur-color-swatch i { color: #ff9900; font-size: 12px; }
+    .muthur-color-swatch[aria-pressed="true"] { outline: 2px solid #ffffff; outline-offset: 1px; }
+    .muthur-enter-btn { width: 32px; height: 24px; display: inline-flex; align-items: center; justify-content: center; background: black; border: 1px solid #ff9900; color: #ff9900; cursor: pointer; box-shadow: inset 0 -2px 0 rgba(255,153,0,0.4); }
+    .muthur-enter-btn:hover { filter: brightness(1.2); }
 `;
     document.head.appendChild(styleSheet);
 
@@ -1404,12 +1498,79 @@ function createGMMuthurInterface(userName, userId) {
         "#ffff00": game.i18n.localize("MUTHUR.SETTINGS.motherResponseColor.yellow")
     };
 
-    Object.entries(colors).forEach(([value, label]) => {
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = label;
-        colorSelect.appendChild(option);
+    // Color picker (caché) pour la couleur personnalisée
+    const colorPicker = document.createElement('input');
+    colorPicker.type = 'color';
+    colorPicker.style.cssText = `
+        position: absolute; left: -10000px; top: -10000px; opacity: 0;
+    `;
+    document.body.appendChild(colorPicker);
+
+    // Lecture de la dernière couleur utilisée
+    let savedColor = '#ff9900';
+    try { savedColor = game.settings.get('alien-mu-th-ur', 'gmResponseColor') || '#ff9900'; } catch (e) {}
+    colorPicker.value = savedColor;
+
+    // Dropdown de couleurs
+    const colorDropdown = document.createElement('div');
+    colorDropdown.className = 'muthur-color-dropdown';
+    const colorToggle = document.createElement('button');
+    colorToggle.className = 'muthur-color-toggle';
+    colorToggle.style.background = savedColor;
+    const colorMenu = document.createElement('div');
+    colorMenu.className = 'muthur-color-menu';
+
+    const predefined = Object.entries(colors).map(([value, label]) => ({ value, label }));
+    let selectedColor = savedColor;
+
+    const createSwatch = ({ value, label }) => {
+        const btn = document.createElement('button');
+        btn.className = 'muthur-color-swatch';
+        btn.style.background = value;
+        btn.setAttribute('aria-label', label);
+        btn.title = label;
+        btn.setAttribute('aria-pressed', String(value.toLowerCase() === selectedColor.toLowerCase()));
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectedColor = value;
+            colorToggle.style.background = selectedColor;
+            Array.from(colorMenu.children).forEach(c => c.setAttribute('aria-pressed', 'false'));
+            btn.setAttribute('aria-pressed', 'true');
+            colorDropdown.classList.remove('open');
+            try { game.settings.set('alien-mu-th-ur', 'gmResponseColor', selectedColor); } catch (e) {}
+        });
+        return btn;
+    };
+
+    predefined.forEach(item => colorMenu.appendChild(createSwatch(item)));
+
+    // Swatch personnalisé (pipette)
+    const customSwatch = document.createElement('button');
+    customSwatch.className = 'muthur-color-swatch';
+    customSwatch.innerHTML = '<i class="fas fa-eye-dropper"></i>';
+    customSwatch.title = 'Personnalisé';
+    customSwatch.addEventListener('click', (e) => {
+        e.stopPropagation();
+        colorPicker.click();
     });
+    colorPicker.addEventListener('input', () => {
+        selectedColor = colorPicker.value;
+        colorToggle.style.background = selectedColor;
+        Array.from(colorMenu.children).forEach(c => c.setAttribute('aria-pressed', 'false'));
+        customSwatch.setAttribute('aria-pressed', 'true');
+        colorDropdown.classList.remove('open');
+        try { game.settings.set('alien-mu-th-ur', 'gmResponseColor', selectedColor); } catch (e) {}
+    });
+    colorMenu.appendChild(customSwatch);
+
+    colorToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        colorDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => colorDropdown.classList.remove('open'));
+
+    colorDropdown.appendChild(colorToggle);
+    colorDropdown.appendChild(colorMenu);
 
     const input = document.createElement('input');
     input.type = 'text';
@@ -1425,21 +1586,20 @@ function createGMMuthurInterface(userName, userId) {
     `;
 
     const sendButton = document.createElement('button');
-    sendButton.textContent = game.i18n.localize("MUTHUR.send");
+    sendButton.className = 'muthur-enter-btn';
+    sendButton.innerHTML = '<i class="fas fa-level-down-alt" style="transform: rotate(90deg);"></i>';
+    sendButton.title = game.i18n.localize("MUTHUR.send");
     sendButton.style.cssText = `
         background: black;
         border: 1px solid #ff9900;
         color: #ff9900;
-        padding: 5px;
         cursor: pointer;
         font-family: monospace;
         height: 24px;
-        line-height: 14px;
-        font-size: 12px;
-        min-width: 50px;
+        width: 32px;
     `;
 
-    responseArea.appendChild(colorSelect);
+    responseArea.appendChild(colorDropdown);
     responseArea.appendChild(input);
     responseArea.appendChild(sendButton);
     container.appendChild(responseArea);
@@ -1447,7 +1607,8 @@ function createGMMuthurInterface(userName, userId) {
     // Gestion des réponses
     const handleResponse = () => {
         if (input.value.trim()) {
-            sendGMResponse(userId, input.value.trim(), colorSelect.value);
+            const chosen = selectedColor;
+            sendGMResponse(userId, input.value.trim(), chosen);
             input.value = '';
         }
     };
@@ -1487,8 +1648,296 @@ async function handleGMResponse(data) {
     messageDiv.classList.add('maman-message');
 
     chatLog.scrollTop = chatLog.scrollHeight;
+    
+    // Mettre à jour également l'interface spectateur si elle existe
+    updateSpectatorsWithMessage(response, `${motherName}: `, data.color || '#ff9900', 'reply');
 }
 
+
+// Fonction pour afficher la fenêtre de sélection des joueurs spectateurs chez le GM
+function showGMSpectatorSelectionDialog(activeUserId, activeUserName) {
+    // Créer la fenêtre de dialogue
+    const dialog = document.createElement('div');
+    dialog.id = 'muthur-spectator-dialog';
+    dialog.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        background: black;
+        border: 2px solid #ff9900;
+        padding: 20px;
+        font-family: monospace;
+        z-index: 100001;
+        color: #ff9900;
+    `;
+
+    // Titre
+    const title = document.createElement('h2');
+    title.textContent = game.i18n.localize("MUTHUR.selectSpectators");
+    title.style.cssText = `
+        margin-top: 0;
+        text-align: center;
+        color: #ff9900;
+        font-family: monospace;
+        font-size: 18px;
+    `;
+    dialog.appendChild(title);
+
+    // Description
+    const description = document.createElement('p');
+    description.textContent = game.i18n.localize("MUTHUR.selectSpectatorsHint");
+    description.style.cssText = `
+        margin-bottom: 15px;
+        color: #ff9900;
+        font-family: monospace;
+    `;
+    dialog.appendChild(description);
+
+    // Liste des joueurs de la scène active
+    const playerList = document.createElement('div');
+    playerList.style.cssText = `
+        max-height: 200px;
+        overflow-y: auto;
+        margin-bottom: 15px;
+        border: 1px solid #ff9900;
+        padding: 10px;
+    `;
+    dialog.appendChild(playerList);
+
+    // Récupérer les joueurs de la scène active (sauf le joueur actif et le GM)
+    const activeScene = game.scenes.active;
+    const players = game.users.filter(user => 
+        !user.isGM && 
+        user.id !== activeUserId && 
+        user.active
+    );
+
+    // Créer les cases à cocher pour chaque joueur
+    players.forEach(player => {
+        const playerItem = document.createElement('div');
+        playerItem.style.cssText = `
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        `;
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `player-${player.id}`;
+        checkbox.value = player.id;
+        checkbox.style.cssText = `
+            margin-right: 10px;
+            cursor: pointer;
+        `;
+
+        const label = document.createElement('label');
+        label.htmlFor = `player-${player.id}`;
+        label.textContent = player.name;
+        label.style.cssText = `
+            cursor: pointer;
+            color: #ff9900;
+            font-family: monospace;
+        `;
+
+        playerItem.appendChild(checkbox);
+        playerItem.appendChild(label);
+        playerList.appendChild(playerItem);
+    });
+
+    // Boutons d'action
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    `;
+
+    const confirmButton = document.createElement('button');
+    confirmButton.textContent = game.i18n.localize("MUTHUR.confirmSpectators");
+    confirmButton.style.cssText = `
+        background: black;
+        border: 1px solid #ff9900;
+        color: #ff9900;
+        padding: 5px 15px;
+        cursor: pointer;
+        font-family: monospace;
+    `;
+
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = game.i18n.localize("MUTHUR.cancelSpectators");
+    cancelButton.style.cssText = `
+        background: black;
+        border: 1px solid #ff9900;
+        color: #ff9900;
+        padding: 5px 15px;
+        cursor: pointer;
+        font-family: monospace;
+    `;
+
+    buttonsContainer.appendChild(confirmButton);
+    buttonsContainer.appendChild(cancelButton);
+    dialog.appendChild(buttonsContainer);
+
+    // Ajouter la fenêtre au document
+    document.body.appendChild(dialog);
+
+    // Gestionnaires d'événements
+    confirmButton.addEventListener('click', () => {
+        // Récupérer les joueurs sélectionnés
+        const selectedPlayers = [];
+        players.forEach(player => {
+            const checkbox = document.getElementById(`player-${player.id}`);
+            if (checkbox && checkbox.checked) {
+                selectedPlayers.push(player.id);
+            }
+        });
+
+        // Fermer la fenêtre de dialogue
+        dialog.remove();
+
+        // Envoyer un signal aux joueurs sélectionnés pour ouvrir l'interface en mode spectateur
+        if (selectedPlayers.length > 0) {
+            game.socket.emit('module.alien-mu-th-ur', {
+                type: 'openSpectatorInterface',
+                spectatorIds: selectedPlayers,
+                activeUserId: activeUserId,
+                activeUserName: activeUserName
+            });
+        }
+        
+        // Envoyer un signal au joueur actif pour continuer avec la séquence de démarrage
+        game.socket.emit('module.alien-mu-th-ur', {
+            type: 'continueBootSequence',
+            targetUserId: activeUserId
+        });
+    });
+
+    cancelButton.addEventListener('click', () => {
+        // Fermer la fenêtre de dialogue
+        dialog.remove();
+        
+        // Envoyer un signal au joueur actif pour continuer avec la séquence de démarrage
+        game.socket.emit('module.alien-mu-th-ur', {
+            type: 'continueBootSequence',
+            targetUserId: activeUserId
+        });
+    });
+}
+
+// Fonction pour afficher l'interface MU/TH/UR en mode spectateur
+function showSpectatorInterface(activeUserId, activeUserName, skipWelcomeMessage = false) {
+    // Vérifier si une interface spectateur existe déjà
+    let spectatorContainer = document.getElementById('muthur-spectator-container');
+    if (spectatorContainer) {
+        return spectatorContainer;
+    }
+
+    // Créer le conteneur principal
+    spectatorContainer = document.createElement('div');
+    spectatorContainer.id = 'muthur-spectator-container';
+
+    // Calcul de la position en fonction de la sidebar
+    const sidebar = document.getElementById('sidebar');
+    const rightPosition = sidebar ? `${sidebar.offsetWidth + 20}px` : '320px';
+
+    spectatorContainer.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: ${rightPosition};
+        width: 400px;
+        height: 600px;
+        background: black;
+        border: 2px solid #00ff00;
+        padding: 10px;
+        font-family: monospace;
+        z-index: 100000;
+        display: flex;
+        flex-direction: column;
+    `;
+    
+    // Ajout d'un header avec titre et bouton de fermeture
+    const headerContainer = document.createElement('div');
+    headerContainer.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    `;
+    
+    const headerTitle = document.createElement('div');
+    headerTitle.textContent = game.i18n.format("MUTHUR.spectatorModeTitle", { userName: activeUserName });
+    headerTitle.style.cssText = `
+        color: #00ff00;
+        font-weight: bold;
+        font-family: monospace;
+        font-size: 16px;
+    `;
+    
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = '&#10006;'; // Symbole X
+    closeButton.style.cssText = `
+        background: black;
+        border: 1px solid #00ff00;
+        color: #00ff00;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-family: monospace;
+        padding: 0;
+        line-height: 1;
+    `;
+    
+    closeButton.addEventListener('click', () => {
+        // Fermer l'interface spectateur
+        document.body.removeChild(spectatorContainer);
+    });
+    
+    headerContainer.appendChild(headerTitle);
+    headerContainer.appendChild(closeButton);
+    spectatorContainer.appendChild(headerContainer);
+
+    // Zone de chat en lecture seule
+    const chatLog = document.createElement('div');
+    chatLog.className = 'muthur-spectator-log';
+    chatLog.style.cssText = `
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 10px;
+        font-family: monospace;
+        padding: 5px;
+        background: rgba(0, 0, 0, 0.8);
+    `;
+    spectatorContainer.appendChild(chatLog);
+
+    // Barre d'information sur le mode spectateur
+    const infoBar = document.createElement('div');
+    infoBar.textContent = game.i18n.localize("MUTHUR.spectatorModeInfo");
+    infoBar.style.cssText = `
+        padding: 5px;
+        text-align: center;
+        color: #00ff00;
+        background-color: rgba(0, 0, 0, 0.8);
+        border-top: 1px solid #00ff00;
+        font-family: monospace;
+        font-size: 12px;
+    `;
+    spectatorContainer.appendChild(infoBar);
+
+    // Ajouter au document
+    document.body.appendChild(spectatorContainer);
+
+    // Afficher le message de bienvenue sauf si on le saute (pour les spectateurs qui ont déjà vu la séquence de boot)
+    if (!skipWelcomeMessage) {
+        displayMuthurMessage(chatLog, game.i18n.format("MUTHUR.spectatorWelcome", { userName: activeUserName }), '', '#00ff00', 'reply');
+    }
+
+    return spectatorContainer;
+}
 
 // Fonction de réception modifiée
 async function handleMuthurResponse(data) {
@@ -1581,32 +2030,95 @@ async function handleMuthurResponse(data) {
 Hooks.on('getSceneControlButtons', (controls) => {
     console.error("Hook getSceneControlButtons appelé");
 
-    const muthurControls = {
-        name: "notes",
-        tools: [{
-            name: "muthur",
-            title: "MU/TH/UR 6000",
-            icon: "fas fa-robot",
-            visible: true,
-            onClick: () => {
-                toggleMuthurChat();
-            },
-            button: true,
-            toggle: false,
-            active: false
-        }]
+    const toolDef = {
+        name: "muthur",
+        title: "MU/TH/UR 6000",
+        icon: "fas fa-robot",
+        visible: true,
+        onClick: () => {
+            console.log("MUTHUR | bouton cliqué");
+            toggleMuthurChat();
+        },
+        button: true,
+        toggle: false,
+        active: false
     };
 
-    const notesGroup = controls.find(c => c.name === "notes");
-    if (notesGroup) {
-        notesGroup.tools.push(muthurControls.tools[0]);
+    // Mode tableau (anciens systèmes / signature historique)
+    const controlList = Array.isArray(controls)
+        ? controls
+        : (Array.isArray(controls?.controls) ? controls.controls : null);
+    if (controlList) {
+        try {
+            console.log("MUTHUR getSceneControlButtons | groupes:", controlList.map(c => ({ name: c.name, tools: Array.isArray(c.tools) ? c.tools.length : 0 })));
+        } catch (e) {
+            console.warn("MUTHUR getSceneControlButtons | log groupes échoué:", e);
+        }
+
+        let targetGroup = controlList.find((c) => c.name === "token")
+            || controlList.find((c) => c.name === "notes");
+        if (!targetGroup) {
+            console.warn("MUTHUR | Aucun groupe cible trouvé (token/notes) en mode tableau. Bouton non ajouté.");
+            return;
+        }
+        if (!Array.isArray(targetGroup.tools)) targetGroup.tools = [];
+        const exists = targetGroup.tools.some((t) => t.name === toolDef.name);
+        console.log("MUTHUR | groupe ciblé (array):", targetGroup.name, "outils existants:", targetGroup.tools.map(t => t.name));
+        if (!exists) {
+            targetGroup.tools.push(toolDef);
+            console.log("MUTHUR | bouton ajouté (array) dans le groupe:", targetGroup.name);
+        }
+        return;
     }
+
+    // Mode objet (Foundry V13)
+    if (controls && typeof controls === 'object') {
+        const keys = Object.keys(controls);
+        console.log("MUTHUR getSceneControlButtons | clés objet:", keys);
+
+        // Choisir la clé: priorité notes, puis token, sinon la première avec des tools valides
+        let targetKey = null;
+        if (controls.notes) targetKey = 'notes';
+        else if (controls.token) targetKey = 'token';
+        else targetKey = keys.find(k => controls[k] && (Array.isArray(controls[k].tools) || (controls[k].tools && typeof controls[k].tools === 'object')));
+
+        if (!targetKey) {
+            console.warn("MUTHUR getSceneControlButtons | aucun groupe avec tools trouvé parmi:", keys);
+            return;
+        }
+
+        const groupObj = controls[targetKey];
+        let tools = groupObj.tools;
+
+        // Ne pas changer la forme d'origine: si c'est un objet, ajouter une clé; si c'est un tableau, push
+        if (Array.isArray(tools)) {
+            const exists = tools.some((t) => t.name === toolDef.name);
+            console.log("MUTHUR | groupe ciblé (object-array):", targetKey, "outils existants:", tools.map(t => t.name));
+            if (!exists) {
+                tools.push(toolDef);
+                console.log("MUTHUR | bouton ajouté (object-array) dans le groupe:", targetKey);
+            }
+        } else if (tools && typeof tools === 'object') {
+            const exists = !!tools[toolDef.name];
+            console.log("MUTHUR | groupe ciblé (object-map):", targetKey, "outils existants:", Object.keys(tools));
+            if (!exists) {
+                tools[toolDef.name] = toolDef;
+                console.log("MUTHUR | bouton ajouté (object-map) dans le groupe:", targetKey);
+            }
+        } else {
+            // Si pas de tools, créer une map pour ne pas casser les autres outils
+            groupObj.tools = { [toolDef.name]: toolDef };
+            console.log("MUTHUR | tools étaient absents. Création map avec outil dans:", targetKey);
+        }
+        return;
+    }
+
+    console.warn("MUTHUR getSceneControlButtons | structure inconnue:", controls);
 });
 
 // Modifier la partie des hooks et de la communication socket
 Hooks.once('ready', async () => {
-    // Chargement des traductions
-
+    // V13: les traductions sont chargées via le manifeste, pas besoin de fetch manuel
     if (game.user.isGM) {
         ChatMessage.create({
             content: `
@@ -1627,30 +2139,7 @@ Hooks.once('ready', async () => {
         });
     }
 
-    try {
-        const module = game.modules.get('alien-mu-th-ur');
-        if (!module) {
-            console.error("Module MU/TH/UR non trouvé!");
-            return;
-        }
-
-        const languagePath = `modules/alien-mu-th-ur/lang/${game.i18n.lang}.json`;
-        const response = await fetch(languagePath);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const translations = await response.json();
-
-        // Fusion des traductions
-        game.i18n.translations = foundry.utils.mergeObject(
-            game.i18n.translations,
-            translations
-        );
-
-    } catch (error) {
-        console.error("Erreur lors du chargement des traductions:", error);
-        return;
-    }
+    // Suppression du chargement manuel des traductions
 
     // Initialiser l'état de la session
     currentMuthurSession = {
@@ -1676,6 +2165,83 @@ Hooks.once('ready', async () => {
                 currentMuthurSession.userId = null;
                 currentMuthurSession.userName = null;
                 ui.notifications.info(game.i18n.localize("MUTHUR.sessionClosedByGM"));
+            }
+            
+            // Fermer également l'interface spectateur si elle existe
+            const spectatorContainer = document.getElementById('muthur-spectator-container');
+            if (spectatorContainer && document.body.contains(spectatorContainer)) {
+                document.body.removeChild(spectatorContainer);
+            }
+        } else if (data.type === 'openSpectatorInterface' && !game.user.isGM && data.spectatorIds.includes(game.user.id)) {
+            // Ouvrir l'interface en mode spectateur
+            showSpectatorInterface(data.activeUserId, data.activeUserName, true);
+            
+            // S'assurer que les spectateurs voient la même chose que le joueur actif
+            game.socket.emit('module.alien-mu-th-ur', {
+                type: 'requestCurrentMessages',
+                targetUserId: data.activeUserId,
+                spectatorId: game.user.id
+            });
+        } else if (data.type === 'updateSpectators' && !game.user.isGM) {
+            // Mettre à jour l'interface spectateur avec un nouveau message
+            const spectatorLog = document.querySelector('.muthur-spectator-log');
+            if (spectatorLog) {
+                displayMuthurMessage(spectatorLog, data.text, data.prefix, data.color, data.messageType);
+                spectatorLog.scrollTop = spectatorLog.scrollHeight;
+            }
+        } else if (data.type === 'requestCurrentMessages' && data.targetUserId === game.user.id) {
+            // Le joueur actif envoie tous ses messages actuels au spectateur qui vient de se connecter
+            const chatLog = document.querySelector('.muthur-chat-log');
+            if (chatLog) {
+                const messages = chatLog.querySelectorAll('.message');
+                const messageData = [];
+                
+                messages.forEach(msg => {
+                    messageData.push({
+                        text: msg.textContent,
+                        color: msg.style.color,
+                        messageType: Array.from(msg.classList).find(c => c !== 'message') || 'normal'
+                    });
+                });
+                
+                game.socket.emit('module.alien-mu-th-ur', {
+                    type: 'syncMessages',
+                    messages: messageData,
+                    targetSpectatorId: data.spectatorId
+                });
+            }
+        } else if (data.type === 'syncMessages' && data.targetSpectatorId === game.user.id) {
+            // Le spectateur reçoit tous les messages actuels du joueur actif
+            const spectatorLog = document.querySelector('.muthur-spectator-log');
+            if (spectatorLog) {
+                // Effacer les messages existants
+                spectatorLog.innerHTML = '';
+                
+                // Ajouter tous les messages reçus
+                data.messages.forEach(msg => {
+                    displayMuthurMessage(spectatorLog, msg.text, '', msg.color, msg.messageType);
+                });
+                
+                spectatorLog.scrollTop = spectatorLog.scrollHeight;
+            }
+        } else if (data.type === 'requestSpectatorSelection' && game.user.isGM) {
+            // Le GM reçoit une demande de sélection des spectateurs
+            showGMSpectatorSelectionDialog(data.userId, data.userName);
+        } else if (data.type === 'continueBootSequence' && !game.user.isGM) {
+            if (data.targetUserId === game.user.id) {
+                // Le joueur peut continuer avec la séquence de démarrage
+                showBootSequence();
+            } else if (data.spectatorIds && data.spectatorIds.includes(game.user.id)) {
+                // Les spectateurs voient aussi la séquence de boot
+                showBootSequence(true);
+            }
+            
+            // Afficher un message d'attente pour le joueur actif
+            if (data.targetUserId === game.user.id) {
+                const waitingContainer = document.getElementById('muthur-waiting-container');
+                if (waitingContainer) {
+                    waitingContainer.remove();
+                }
             }
         } else if (data.type === 'hackProgress' && game.user.isGM) {
             const gmChatLog = document.querySelector('.gm-chat-log');
@@ -2397,6 +2963,13 @@ async function simulateHackingAttempt(chatLog) {
                 'normal',
                 false
             );
+            
+            // Synchroniser le résultat avec les spectateurs
+            syncCommandResult('HACK', {
+                text: game.i18n.localize('MOTHER.WelcomeAdminFull'),
+                color: '#00ff00',
+                type: 'normal'
+            });
         }
 
     } finally {
@@ -2563,14 +3136,20 @@ async function handleSpecialOrder(chatLog, command) {
                 });
             }
             // Afficher le message de confirmation
-            await displayMuthurMessage(
+            await syncMessageToSpectators(
                 chatLog,
                 game.i18n.localize("MOTHER.SpecialOrders.Cerberus.confirmation"),
                 '',
                 '#ff0000',
                 'error'
             );
-
+            
+            // Synchroniser le résultat avec les spectateurs
+            syncCommandResult('SPECIAL_ORDER', {
+                text: game.i18n.localize("MOTHER.SpecialOrders.Cerberus.confirmation"),
+                color: '#ff0000',
+                type: 'error'
+            });
 
             const confirmationDiv = document.createElement('div');
             confirmationDiv.style.cssText = `

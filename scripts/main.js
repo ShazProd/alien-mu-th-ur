@@ -3702,9 +3702,33 @@ async function handleSpecialOrder(chatLog, command) {
 
         await displayHackMessage(chatLog, orderName, '#00ff00', 'reply', false);
         try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackStream', text: orderName, color: '#00ff00', msgType: 'reply', isPassword: false }); } catch(e) {}
+        // Envoyer au MJ le nom de l'ordre (comme réponse de MUTHUR) après hack réussi
+        try {
+            if (!game.user.isGM && hackSuccessful) {
+                game.socket.emit('module.alien-mu-th-ur', {
+                    type: 'muthurCommand',
+                    command: orderName,
+                    user: 'MUTHUR 6000',
+                    userId: game.user.id,
+                    timestamp: Date.now()
+                });
+            }
+        } catch(e) {}
 
         await displayHackMessage(chatLog, orderDesc, '#00ff00', 'reply', false);
         try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackStream', text: orderDesc, color: '#00ff00', msgType: 'reply', isPassword: false }); } catch(e) {}
+        // Envoyer au MJ la description de l'ordre (comme réponse de MUTHUR) après hack réussi
+        try {
+            if (!game.user.isGM && hackSuccessful) {
+                game.socket.emit('module.alien-mu-th-ur', {
+                    type: 'muthurCommand',
+                    command: orderDesc,
+                    user: 'MUTHUR 6000',
+                    userId: game.user.id,
+                    timestamp: Date.now()
+                });
+            }
+        } catch(e) {}
     } else {
         await displayHackMessage(
             chatLog,

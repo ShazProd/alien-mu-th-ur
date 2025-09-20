@@ -2900,17 +2900,17 @@ async function playReplySound() {
             }, 900);
             return true;
         } else {
-            currentReplySound = new Audio(soundPath);
-            currentReplySound.volume = volume;
-            currentReplySound.onended = async () => {
-                if (shouldContinueReplySound) {
-                    await playReplySound(); // Jouer un nouveau son si on doit continuer
+        currentReplySound = new Audio(soundPath);
+        currentReplySound.volume = volume;
+        currentReplySound.onended = async () => {
+            if (shouldContinueReplySound) {
+                await playReplySound(); // Jouer un nouveau son si on doit continuer
                 } else {
                     /* no-op */
-                }
-            };
+            }
+        };
             currentReplySound.onerror = () => { currentReplySound = null; };
-            return currentReplySound.play();
+        return currentReplySound.play();
         }
 
     } catch (error) {

@@ -57,26 +57,8 @@ async function showBootSequence(isSpectator = false) {
         opacity: 0;
         z-index: -1;
     `;
-
-    backgroundLogo.innerHTML = `
-        <svg width="100%" height="100%" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
-            <g class="logo-group">
-                <text x="400" y="100" text-anchor="middle" class="logo-text" 
-                    style="fill: #00ff00; font-size: 48px; font-family: Arial;">WEYLAND-YUTANI CORP</text>
-                <path class="logo-path" 
-                    d="M 200,150 L 350,150 L 400,250 L 450,150 L 600,150" 
-                    fill="none" 
-                    stroke="#00ff00" 
-                    stroke-width="4"
-                    stroke-dasharray="1000"
-                    stroke-dashoffset="1000"/>
-                <text x="400" y="300" text-anchor="middle" class="logo-slogan"
-                    style="fill: #00ff00; font-size: 36px; font-family: Arial;">"Building Better Worlds"</text>
-                <text x="400" y="350" text-anchor="middle" class="logo-locations"
-                    style="fill: #00ff00; font-size: 24px; font-family: Arial;">TOKYO · LONDON · SAN FRANCISCO · SEA OF TRANQUILITY · THEDUS</text>
-            </g>
-        </svg>
-    `;
+    // SVG retiré pour éviter les erreurs GSAP lorsqu'il n'est pas rendu
+    backgroundLogo.innerHTML = '';
 
     bootContainer.appendChild(backgroundLogo);
 
@@ -84,29 +66,14 @@ async function showBootSequence(isSpectator = false) {
 
    
 
+    try {
     gsap.timeline()
     .to(backgroundLogo, {
-        opacity: 0.15,
-        duration: 2,
-        ease: 'power2.inOut'
-    })
-    .to('.logo-path', {
-        strokeDashoffset: 0,
-        duration: 3,
-        ease: 'power2.inOut',
-        repeat: -1, // Répétition infinie
-        repeatDelay: 1, // Délai avant chaque répétition
-        onRepeat: () => {
-            gsap.set('.logo-path', { strokeDashoffset: 1000 }); // Reset à la position initiale
-        }
-    }, '-=1')
-    .to('.logo-path', {
-        filter: 'drop-shadow(0 0 8px #00ff00)',
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
+            opacity: 0.1,
+            duration: 1.2,
         ease: 'power2.inOut'
     });
+    } catch (e) { /* no-op if GSAP missing */ }
 
     // Logo Weyland-Yutani
     const logo = document.createElement('div');
@@ -174,7 +141,7 @@ async function showBootSequence(isSpectator = false) {
         100% { opacity: 0.5; }
     }
 `;
-    document.head.appendChild(styleSheet);
+    try { document.head.appendChild(styleSheet); } catch (e) {}
 
     // Vignette ajustée
     const vignette = document.createElement('div');
@@ -304,6 +271,9 @@ async function showBootSequence(isSpectator = false) {
         }
     });
 }
+
+// Exposer pour les autres scripts (spectateurs)
+try { window.showBootSequence = showBootSequence; } catch (e) {}
 
 
 function startCerberusCountdown() {
@@ -714,6 +684,59 @@ Hooks.once('init', () => {
         default: 5,      // 5 minutes par défaut
         restricted: true    // Seul le GM peut le modifier
     });
+
+    // [Roles & Status] Réglages monde (GM uniquement)
+    game.settings.register('alien-mu-th-ur', 'currentStatusKey', {
+        name: 'MUTHUR.STATUS.current',
+        hint: 'MUTHUR.STATUS.currentHint',
+        scope: 'world',
+        config: true,
+        type: String,
+        choices: {
+            normal: 'MUTHUR.STATUS.presets.normal',
+            anomalyDetected: 'MUTHUR.STATUS.presets.anomalyDetected',
+            systemOffline: 'MUTHUR.STATUS.presets.systemOffline',
+            degradedPerformance: 'MUTHUR.STATUS.presets.degradedPerformance',
+            fireDetected: 'MUTHUR.STATUS.presets.fireDetected',
+            quarantine: 'MUTHUR.STATUS.presets.quarantine',
+            lockdown: 'MUTHUR.STATUS.presets.lockdown',
+            intrusion: 'MUTHUR.STATUS.presets.intrusion',
+            networkIssue: 'MUTHUR.STATUS.presets.networkIssue',
+            custom: 'MUTHUR.STATUS.presets.custom'
+        },
+        default: 'normal',
+        restricted: true
+    });
+
+    game.settings.register('alien-mu-th-ur', 'customStatusText', {
+        name: 'MUTHUR.STATUS.customText',
+        hint: 'MUTHUR.STATUS.customTextHint',
+        scope: 'world',
+        config: true,
+        type: String,
+        default: '' ,
+        restricted: true
+    });
+
+    game.settings.register('alien-mu-th-ur', 'captainUserIds', {
+        name: 'MUTHUR.ROLES.captains',
+        hint: 'MUTHUR.ROLES.captainsHint',
+        scope: 'world',
+        config: false,
+        type: Array,
+        default: [],
+        restricted: true
+    });
+
+    game.settings.register('alien-mu-th-ur', 'allowCaptainSpecialOrders', {
+        name: 'MUTHUR.ROLES.allowCaptainOrders',
+        hint: 'MUTHUR.ROLES.allowCaptainOrdersHint',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+        restricted: true
+    });
 });
 
 
@@ -728,6 +751,81 @@ window.MUTHUR.updateColors = () => {
             msg.style.color = motherColor;
         }
     });
+};
+
+// Effet de glitch léger pour une réponse (utilisé sur STATUS dégradé)
+window.MUTHUR.applyLightGlitch = (targetElement, durationMs = 1200) => {
+    if (!targetElement) return;
+    const originalTransform = targetElement.style.transform || '';
+    const originalFilter = targetElement.style.filter || '';
+    const start = performance.now();
+    const tick = (now) => {
+        const t = now - start;
+        if (t >= durationMs) {
+            targetElement.style.transform = originalTransform;
+            targetElement.style.filter = originalFilter;
+            return;
+        }
+        // Petites secousses et déformations chromatiques légères
+        const dx = (Math.random() - 0.5) * 2; // [-1,1]px
+        const skew = (Math.random() - 0.5) * 1.2; // petits skew
+        const hue = (Math.random() - 0.5) * 8; // légère variation teinte
+        targetElement.style.transform = `translate(${dx}px,0) skewX(${skew}deg)`;
+        targetElement.style.filter = `hue-rotate(${hue}deg) saturate(1.05)`;
+        requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+};
+
+// Effet de glitch d'écran plus visible (barres, bruit, jitter global)
+window.MUTHUR.applyScreenGlitch = (durationMs = 1800) => {
+    // Style unique
+    if (!document.getElementById('muthur-glitch-style')) {
+        const style = document.createElement('style');
+        style.id = 'muthur-glitch-style';
+        style.textContent = `
+        @keyframes muthur-glitch-bars { 0%{transform: translateY(-100%);} 100%{transform: translateY(100%);} }
+        @keyframes muthur-glitch-shake { 0%,100%{ transform: translate(0,0) } 25%{ transform: translate(1px,-1px) } 50%{ transform: translate(-1px,1px) } 75%{ transform: translate(1px,1px) } }
+        .muthur-glitch-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 100004; mix-blend-mode: lighten; }
+        .muthur-glitch-noise { position:absolute; inset:0; background:
+            repeating-linear-gradient(0deg, rgba(0,255,0,0.04) 0px, rgba(0,255,0,0.04) 2px, transparent 2px, transparent 4px),
+            repeating-linear-gradient(90deg, rgba(255,0,0,0.03) 0px, rgba(0,0,255,0.03) 2px, transparent 2px, transparent 4px);
+            animation: muthur-glitch-shake 0.08s infinite;
+        }
+        .muthur-glitch-bar { position:absolute; left:0; width:100%; height:14px; background: linear-gradient(90deg, rgba(0,255,0,0.25), rgba(255,255,255,0.12), rgba(0,255,0,0.25)); opacity:0.85;
+            filter: blur(0.5px); animation: muthur-glitch-bars 0.7s linear infinite; }
+        `;
+        document.head.appendChild(style);
+    }
+    const overlay = document.createElement('div');
+    overlay.className = 'muthur-glitch-overlay';
+    const noise = document.createElement('div'); noise.className = 'muthur-glitch-noise'; overlay.appendChild(noise);
+    // Quelques barres qui défilent
+    for (let i=0;i<3;i++){ const bar = document.createElement('div'); bar.className = 'muthur-glitch-bar'; bar.style.animationDelay = `${Math.random()*0.6}s`; bar.style.height = `${10+Math.floor(Math.random()*10)}px`; overlay.appendChild(bar); }
+    document.body.appendChild(overlay);
+
+    // Légère altération globale
+    const originalFilter = document.body.style.filter || '';
+    document.body.style.filter = 'contrast(1.25) saturate(1.2) hue-rotate(6deg)';
+
+    // Jitter ciblé sur le conteneur si présent
+    const container = document.getElementById('muthur-chat-container');
+    const gmContainer = document.getElementById('gm-muthur-container');
+    const shaken = container || gmContainer || document.body;
+    const originalTransform = shaken.style.transform || '';
+    const jitter = setInterval(()=>{
+        const dx = (Math.random()-0.5)*3;
+        const dy = (Math.random()-0.5)*3;
+        const skew = (Math.random()-0.5)*1.5;
+        shaken.style.transform = `translate(${dx}px,${dy}px) skewX(${skew}deg)`;
+    }, 35);
+
+    setTimeout(()=>{
+        clearInterval(jitter);
+        shaken.style.transform = originalTransform;
+        document.body.style.filter = originalFilter;
+        overlay.remove();
+    }, durationMs);
 };
 
 
@@ -785,8 +883,12 @@ async function displayMuthurMessage(chatLog, text, prefix = '', color = '#00ff00
     messageDiv.style.minHeight = '25px';
     chatLog.appendChild(messageDiv);
 
+    // Marquer pour la synchronisation postérieure (requestCurrentMessages)
+    try { messageDiv.classList.add('message', messageType || 'normal'); } catch (e) {}
+
     const typewriterEnabled = game.settings.get('alien-mu-th-ur', 'enableTypewriter');
-    const soundEnabled = game.settings.get('alien-mu-th-ur', 'enableTypingSounds');
+    const soundGloballyMuted = (window.MUTHUR && window.MUTHUR.muteForSpectator) ? true : false;
+    const soundEnabled = !soundGloballyMuted && game.settings.get('alien-mu-th-ur', 'enableTypingSounds');
     const scanlineEnabled = game.settings.get('alien-mu-th-ur', 'enableScanline');
 
     try {
@@ -796,7 +898,7 @@ async function displayMuthurMessage(chatLog, text, prefix = '', color = '#00ff00
                     await playErrorSound();
                     break;
                 case 'communication':
-                    await playComSound();
+                    await playComSoundThrottled();
                     break;
                 case 'reply':
                     shouldContinueReplySound = true;
@@ -857,15 +959,11 @@ async function displayMuthurMessage(chatLog, text, prefix = '', color = '#00ff00
             messageDiv.textContent = prefix ? prefix + text : text;
         }
 
-        if (messageType === 'reply') {
-            stopReplySound();
-        }
+        if (messageType === 'reply') { stopReplySound(); }
     } catch (error) {
         console.error("Erreur d'affichage:", error);
         messageDiv.textContent = prefix ? prefix + text : text;
-        if (messageType === 'reply') {
-            stopReplySound();
-        }
+        if (messageType === 'reply') { stopReplySound(); }
     }
 
     chatLog.scrollTop = chatLog.scrollHeight;
@@ -1045,7 +1143,19 @@ function showMuthurInterface() {
             // Dans showMuthurInterface, dans la fonction handleCommand, remplacer :
             // Dans showMuthurInterface, dans handleCommand
             if (isSpecialOrder(command) || isCerberus(command)) {
-                if (!hackSuccessful) {
+                const isCaptain = (() => {
+                    try {
+                        const ids = game.settings.get('alien-mu-th-ur', 'captainUserIds') || [];
+                        return ids.includes(game.user.id);
+                    } catch (e) { return false; }
+                })();
+
+                const allowCaptain = (() => {
+                    try { return game.settings.get('alien-mu-th-ur', 'allowCaptainSpecialOrders'); } catch (e) { return true; }
+                })();
+
+                const canAccess = game.user.isGM || hackSuccessful || (allowCaptain && isCaptain);
+                if (!canAccess) {
                     await syncMessageToSpectators(
                         chatLog,
                         game.i18n.localize('MOTHER.AccessDenied'),
@@ -1066,6 +1176,7 @@ function showMuthurInterface() {
                 }
 
                 await handleSpecialOrder(chatLog, command);
+                // Diffuser l'animation Cerberus aux spectateurs si elle est déclenchée dans handleSpecialOrder
                 return;
             }
 
@@ -1119,25 +1230,57 @@ function showMuthurInterface() {
                     return; // Empêche l'envoi d'une commande non reconnue
                     break;
                 case 'HELP':
-                    await displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.help"), '', '#00ff00', 'reply');
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.help"), '', '#00ff00', 'reply');
                     // Si c'est un joueur, envoyer au MJ comme commande valide
                     if (!game.user.isGM) {
                         sendToGM(command, 'command', 'valid');
                     }
                     break;
                 case 'STATUS':
-                    await displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.status"), '', '#00ff00', 'reply');
-                    // Si c'est un joueur, envoyer au MJ comme commande valide
                     if (!game.user.isGM) {
-                        sendToGM(command, 'command', 'valid');
+                        // Demander au GM de choisir un statut à renvoyer
+                        game.socket.emit('module.alien-mu-th-ur', {
+                            type: 'statusRequest',
+                            fromId: game.user.id,
+                            fromName: game.user.name
+                        });
+                        await displayMuthurMessage(
+                            chatLog,
+                            game.i18n.localize('MUTHUR.waitingResponse'),
+                            '', '#00ff00', 'communication'
+                        );
+                    } else {
+                        // GM local: envoyer directement le statut courant comme fallback
+                        const key = game.settings.get('alien-mu-th-ur', 'currentStatusKey');
+                        const presets = {
+                            normal: 'MUTHUR.STATUS.text.normal',
+                            anomalyDetected: 'MUTHUR.STATUS.text.anomalyDetected',
+                            systemOffline: 'MUTHUR.STATUS.text.systemOffline',
+                            degradedPerformance: 'MUTHUR.STATUS.text.degradedPerformance',
+                            fireDetected: 'MUTHUR.STATUS.text.fireDetected',
+                            quarantine: 'MUTHUR.STATUS.text.quarantine',
+                            lockdown: 'MUTHUR.STATUS.text.lockdown',
+                            intrusion: 'MUTHUR.STATUS.text.intrusion',
+                            networkIssue: 'MUTHUR.STATUS.text.networkIssue'
+                        };
+                        const i18nKey = (key === 'custom') ? null : (presets[key] || 'MUTHUR.status');
+                        const statusText = i18nKey ? game.i18n.localize(i18nKey)
+                            : (game.settings.get('alien-mu-th-ur', 'customStatusText') || game.i18n.localize('MUTHUR.status'));
+                        await syncMessageToSpectators(chatLog, statusText, '', '#00ff00', 'reply');
                     }
                     break;
                 case 'CLEAR':
                     chatLog.innerHTML = '';
+                    // Synchroniser l'effacement côté spectateur lorsque c'est un joueur
+                    if (!game.user.isGM) {
+                        try {
+                            game.socket.emit('module.alien-mu-th-ur', { type: 'clearSpectatorChat' });
+                        } catch (e) { console.warn('MUTHUR | emission clearSpectatorChat échouée', e); }
+                    }
                     if (hackSuccessful) {
-                        await displayMuthurMessage(chatLog, game.i18n.localize("MOTHER.WelcomeAdminFull"), '', '#00ff00', 'reply');
+                        await syncMessageToSpectators(chatLog, game.i18n.localize("MOTHER.WelcomeAdminFull"), '', '#00ff00', 'reply');
                     } else {
-                        await displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.welcome"), '', '#00ff00', 'reply');
+                        await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.welcome"), '', '#00ff00', 'reply');
                     }
                     // Si c'est un joueur, envoyer au MJ comme commande valide
                     if (!game.user.isGM) {
@@ -1145,7 +1288,7 @@ function showMuthurInterface() {
                     }
                     break;
                 case 'EXIT':
-                    await displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.sessionEnded"), '', '#00ff00', 'reply');
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.sessionEnded"), '', '#00ff00', 'reply');
                     setTimeout(() => {
                         // Utiliser document.getElementById au lieu de la variable container
                         const muthurContainer = document.getElementById('muthur-chat-container');
@@ -1172,7 +1315,7 @@ function showMuthurInterface() {
                     return;
                 default:
                     if (!command.startsWith(motherPrefix)) {
-                        await displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.commandNotFound"), '', '#00ff00', 'error');
+                        await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.commandNotFound"), '', '#00ff00', 'error');
                     }
             }
         }
@@ -1572,6 +1715,59 @@ function createGMMuthurInterface(userName, userId) {
     colorDropdown.appendChild(colorToggle);
     colorDropdown.appendChild(colorMenu);
 
+    // Bouton gestion Capitaines (icône couronne)
+    const manageCaptainsBtn = document.createElement('button');
+    manageCaptainsBtn.innerHTML = '<i class="fas fa-crown"></i>';
+    manageCaptainsBtn.title = game.i18n.localize('MUTHUR.ROLES.manageCaptains');
+    manageCaptainsBtn.style.cssText = `
+        width: 28px; height: 24px; background: black; border: 1px solid #ff9900; color: #ff9900; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    `;
+    manageCaptainsBtn.addEventListener('click', () => {
+        if (!game.user.isGM) return;
+        const dialog = document.createElement('div');
+        dialog.style.cssText = `position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: black; border: 2px solid #ff9900; padding: 12px; z-index: 100003; color: #ff9900; min-width: 280px;`;
+        const title = document.createElement('div');
+        title.textContent = game.i18n.localize('MUTHUR.ROLES.captainLabel');
+        title.style.cssText = 'font-weight: bold; margin-bottom: 8px;';
+        dialog.appendChild(title);
+
+        const list = document.createElement('div');
+        list.style.cssText = 'max-height: 240px; overflow: auto; margin-bottom: 8px;';
+        const ids = (() => { try { return game.settings.get('alien-mu-th-ur', 'captainUserIds') || []; } catch(e) { return []; } })();
+        game.users.forEach(u => {
+            if (u.isGM) return; // ne pas lister les GM
+            const row = document.createElement('label');
+            row.style.cssText = 'display:flex; align-items:center; gap:6px; margin: 2px 0;';
+            const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = ids.includes(u.id);
+            cb.addEventListener('change', async () => {
+                const current = (() => { try { return game.settings.get('alien-mu-th-ur', 'captainUserIds') || []; } catch(e) { return []; } })();
+                const next = cb.checked ? Array.from(new Set([...current, u.id])) : current.filter(id => id !== u.id);
+                try { await game.settings.set('alien-mu-th-ur', 'captainUserIds', next); } catch(e) { console.error(e); }
+            });
+            const name = document.createElement('span'); name.textContent = u.name;
+            row.appendChild(cb); row.appendChild(name); list.appendChild(row);
+        });
+        dialog.appendChild(list);
+
+        const allowWrap = document.createElement('label');
+        allowWrap.style.cssText = 'display:flex; align-items:center; gap:6px; margin-top: 6px;';
+        const allow = document.createElement('input'); allow.type = 'checkbox';
+        try { allow.checked = game.settings.get('alien-mu-th-ur', 'allowCaptainSpecialOrders'); } catch(e) {}
+        allow.addEventListener('change', async () => {
+            try { await game.settings.set('alien-mu-th-ur', 'allowCaptainSpecialOrders', allow.checked); } catch(e) { console.error(e); }
+        });
+        const allowLbl = document.createElement('span'); allowLbl.textContent = game.i18n.localize('MUTHUR.ROLES.allowCaptainOrders');
+        allowWrap.appendChild(allow); allowWrap.appendChild(allowLbl);
+        dialog.appendChild(allowWrap);
+
+        const close = document.createElement('button');
+        close.textContent = 'OK';
+        close.style.cssText = 'margin-top: 10px; background:black; border:1px solid #ff9900; color:#ff9900; padding: 4px 10px; cursor:pointer;';
+        close.addEventListener('click', () => dialog.remove());
+        dialog.appendChild(close);
+        document.body.appendChild(dialog);
+    });
+
     const input = document.createElement('input');
     input.type = 'text';
     input.style.cssText = `
@@ -1600,6 +1796,7 @@ function createGMMuthurInterface(userName, userId) {
     `;
 
     responseArea.appendChild(colorDropdown);
+    responseArea.appendChild(manageCaptainsBtn);
     responseArea.appendChild(input);
     responseArea.appendChild(sendButton);
     container.appendChild(responseArea);
@@ -1807,10 +2004,12 @@ function showGMSpectatorSelectionDialog(activeUserId, activeUserName) {
             });
         }
         
-        // Envoyer un signal au joueur actif pour continuer avec la séquence de démarrage
+        // Envoyer un signal au joueur actif et aux spectateurs pour continuer avec la séquence de démarrage
         game.socket.emit('module.alien-mu-th-ur', {
             type: 'continueBootSequence',
-            targetUserId: activeUserId
+            targetUserId: activeUserId,
+            spectatorIds: selectedPlayers,
+            activeUserName: activeUserName
         });
     });
 
@@ -1818,10 +2017,12 @@ function showGMSpectatorSelectionDialog(activeUserId, activeUserName) {
         // Fermer la fenêtre de dialogue
         dialog.remove();
         
-        // Envoyer un signal au joueur actif pour continuer avec la séquence de démarrage
+    // Envoyer un signal au joueur actif pour continuer avec la séquence de démarrage (sans spectateurs)
         game.socket.emit('module.alien-mu-th-ur', {
             type: 'continueBootSequence',
-            targetUserId: activeUserId
+        targetUserId: activeUserId,
+        spectatorIds: [],
+        activeUserName: activeUserName
         });
     });
 }
@@ -1939,6 +2140,18 @@ function showSpectatorInterface(activeUserId, activeUserName, skipWelcomeMessage
     return spectatorContainer;
 }
 
+// Exposer quelques API nécessaires aux spectateurs
+try {
+    window.displayMuthurMessage = displayMuthurMessage;
+    window.displayHackMessage = displayHackMessage;
+    window.updateSpectatorsWithMessage = updateSpectatorsWithMessage;
+    window.syncMessageToSpectators = syncMessageToSpectators;
+    window.showSpectatorInterface = showSpectatorInterface;
+    window.currentMuthurSession = currentMuthurSession;
+    window.createHackingWindows = createHackingWindows;
+    window.clearHackingElements = clearHackingElements;
+} catch (e) {}
+
 // Fonction de réception modifiée
 async function handleMuthurResponse(data) {
     if (!game.user.isGM) return;
@@ -2031,17 +2244,17 @@ Hooks.on('getSceneControlButtons', (controls) => {
     console.error("Hook getSceneControlButtons appelé");
 
     const toolDef = {
-        name: "muthur",
-        title: "MU/TH/UR 6000",
-        icon: "fas fa-robot",
-        visible: true,
-        onClick: () => {
+            name: "muthur",
+            title: "MU/TH/UR 6000",
+            icon: "fas fa-robot",
+            visible: true,
+            onClick: () => {
             console.log("MUTHUR | bouton cliqué");
-            toggleMuthurChat();
-        },
-        button: true,
-        toggle: false,
-        active: false
+                toggleMuthurChat();
+            },
+            button: true,
+            toggle: false,
+            active: false
     };
 
     // Mode tableau (anciens systèmes / signature historique)
@@ -2230,10 +2443,11 @@ Hooks.once('ready', async () => {
         } else if (data.type === 'continueBootSequence' && !game.user.isGM) {
             if (data.targetUserId === game.user.id) {
                 // Le joueur peut continuer avec la séquence de démarrage
-                showBootSequence();
+            try { showBootSequence(); } catch(e) { console.warn('Boot sequence error (player):', e); }
             } else if (data.spectatorIds && data.spectatorIds.includes(game.user.id)) {
-                // Les spectateurs voient aussi la séquence de boot
-                showBootSequence(true);
+                // Les spectateurs voient aussi la séquence de boot et ouvrent l'interface spectateur
+                try { showBootSequence(true); } catch(e) { console.warn('Boot sequence error (spectator):', e); }
+                try { showSpectatorInterface(data.targetUserId || data.activeUserId, data.activeUserName || (currentMuthurSession && currentMuthurSession.userName) || ''); } catch(e) { console.warn('Spectator interface error:', e); }
             }
             
             // Afficher un message d'attente pour le joueur actif
@@ -2371,6 +2585,97 @@ Hooks.once('ready', async () => {
                     };
                 });
             }
+        } else if (data.type === 'statusRequest' && game.user.isGM) {
+            // Afficher un petit sélecteur pour choisir quel statut renvoyer au joueur demandeur
+            const requesterId = data.fromId;
+            const requesterName = data.fromName;
+
+            const picker = document.createElement('div');
+            picker.style.cssText = `
+                position: fixed; bottom: 90px; right: 20px; background: black; border: 2px solid #ff9900; padding: 8px; z-index: 100003; color: #ff9900; min-width: 260px;
+            `;
+            const title = document.createElement('div');
+            title.textContent = `${game.i18n.localize('MUTHUR.STATUS.current')} - ${requesterName}`;
+            title.style.cssText = 'font-weight:bold; margin-bottom:6px;';
+            picker.appendChild(title);
+
+            const select = document.createElement('select');
+            select.style.cssText = 'width:100%; background:black; color:#ff9900; border:1px solid #ff9900; margin-bottom:6px;';
+            const options = [
+                {k:'normal'}, {k:'anomalyDetected'}, {k:'systemOffline'}, {k:'degradedPerformance'}, {k:'fireDetected'},
+                {k:'quarantine'}, {k:'lockdown'}, {k:'intrusion'}, {k:'networkIssue'}, {k:'custom'}
+            ];
+            options.forEach(o=>{
+                const opt = document.createElement('option');
+                opt.value = o.k;
+                opt.textContent = game.i18n.localize(`MUTHUR.STATUS.presets.${o.k}`);
+                select.appendChild(opt);
+            });
+            picker.appendChild(select);
+
+            const btn = document.createElement('button');
+            btn.textContent = 'OK';
+            btn.style.cssText = 'background:black; border:1px solid #ff9900; color:#ff9900; padding:4px 10px; cursor:pointer;';
+            btn.addEventListener('click', ()=>{
+                const key = select.value;
+                const presets = {
+                    normal: 'MUTHUR.STATUS.text.normal',
+                    anomalyDetected: 'MUTHUR.STATUS.text.anomalyDetected',
+                    systemOffline: 'MUTHUR.STATUS.text.systemOffline',
+                    degradedPerformance: 'MUTHUR.STATUS.text.degradedPerformance',
+                    fireDetected: 'MUTHUR.STATUS.text.fireDetected',
+                    quarantine: 'MUTHUR.STATUS.text.quarantine',
+                    lockdown: 'MUTHUR.STATUS.text.lockdown',
+                    intrusion: 'MUTHUR.STATUS.text.intrusion',
+                    networkIssue: 'MUTHUR.STATUS.text.networkIssue'
+                };
+                const i18nKey = (key === 'custom') ? null : (presets[key] || 'MUTHUR.status');
+                const statusText = i18nKey ? game.i18n.localize(i18nKey)
+                    : (game.settings.get('alien-mu-th-ur', 'customStatusText') || game.i18n.localize('MUTHUR.status'));
+                // Envoyer au joueur demandeur
+                game.socket.emit('module.alien-mu-th-ur', {
+                    type: 'statusResponse',
+                    targetUserId: requesterId,
+                    text: statusText,
+                    statusKey: key
+                });
+                picker.remove();
+            });
+            picker.appendChild(btn);
+            const cancel = document.createElement('button');
+            cancel.textContent = 'X';
+            cancel.style.cssText = 'float:right; background:black; border:1px solid #ff9900; color:#ff9900; padding:4px 8px; margin-left:6px; cursor:pointer;';
+            cancel.addEventListener('click', ()=>picker.remove());
+            picker.appendChild(cancel);
+            document.body.appendChild(picker);
+
+        } else if (data.type === 'statusResponse' && data.targetUserId === game.user.id) {
+            const chatLog = document.querySelector('.muthur-chat-log');
+            if (chatLog) {
+                const maybePromise = displayMuthurMessage(chatLog, data.text, '', '#00ff00', 'reply');
+                const handleGlitch = (msgDiv) => {
+                    if (data.statusKey === 'degradedPerformance' && msgDiv) {
+                        if (window.MUTHUR && typeof window.MUTHUR.applyLightGlitch === 'function') {
+                            window.MUTHUR.applyLightGlitch(msgDiv, 1500);
+                        }
+                    }
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                };
+                const broadcastToSpectators = () => {
+                    try {
+                        const motherName = game.i18n.localize('MUTHUR.motherName');
+                        updateSpectatorsWithMessage(data.text, `${motherName}: `, '#00ff00', 'reply');
+                    } catch (e) { /* noop */ }
+                };
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise.then((div)=>{ handleGlitch(div); if (data.statusKey === 'degradedPerformance') window.MUTHUR.applyScreenGlitch(1200); try{ const spectatorLog = document.querySelector('.muthur-spectator-log'); if (spectatorLog) displayMuthurMessage(spectatorLog, data.text, '', '#00ff00', 'reply'); }catch(e){} broadcastToSpectators(); });
+                } else {
+                    handleGlitch(maybePromise);
+                    if (data.statusKey === 'degradedPerformance') window.MUTHUR.applyScreenGlitch(1200);
+                    try{ const spectatorLog = document.querySelector('.muthur-spectator-log'); if (spectatorLog) displayMuthurMessage(spectatorLog, data.text, '', '#00ff00', 'reply'); }catch(e){}
+                    broadcastToSpectators();
+                }
+            }
         }
     });
 
@@ -2449,6 +2754,17 @@ function getTranslation(key) {
 
 
 
+let lastComSoundAt = 0;
+function playComSoundThrottled(minIntervalMs = 200) {
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if (now - lastComSoundAt < minIntervalMs) {
+        try { console.log('MUTHUR Audio | playComSound throttled'); } catch(e) {}
+        return Promise.resolve();
+    }
+    lastComSoundAt = now;
+    return playComSound();
+}
+
 function playTypeSound() {
     try {
         // Récupérer le volume depuis les settings
@@ -2458,19 +2774,19 @@ function playTypeSound() {
         const randomNumber = Math.floor(Math.random() * 34) + 1;
 
         // Construire le chemin du fichier en utilisant le bon chemin du module
-        const soundPath = `modules/alien-mu-th-ur/sounds/keypress/Keypress_${randomNumber}.wav`;
+        const soundPath = `/modules/alien-mu-th-ur/sounds/keypress/Keypress_${randomNumber}.wav`;
 
 
 
         const sound = new Audio(soundPath);
         sound.volume = volume;
+        sound.onplay = () => { try { console.log('MUTHUR Audio | playTypeSound onplay', { soundPath, volume }); } catch(e) {} };
+        sound.onended = () => { try { console.log('MUTHUR Audio | playTypeSound ended'); } catch(e) {} };
+        sound.onerror = (e) => { try { console.error('MUTHUR Audio | playTypeSound error', { soundPath, error: e }); } catch(_) {} };
 
-        // Ajouter un gestionnaire d'erreur plus détaillé
-        sound.onerror = (e) => {
-            console.error("Erreur de chargement du son:", e);
-        };
-
-        return sound.play();
+        const p = sound.play();
+        try { console.log('MUTHUR Audio | playTypeSound invoked', { soundPath, volume }); } catch(e) {}
+        return p;
 
     } catch (error) {
         console.error("Erreur lors de la lecture du son:", error);
@@ -2486,6 +2802,21 @@ function isTypewriterEnabled() {
     }
 }
 
+// Utilitaire: essayer de jouer via AudioHelper (Foundry), sinon fallback HTMLAudio
+async function playSoundWithHelper(soundPath, volume, loop = false, label = 'generic') {
+    try {
+        if (typeof AudioHelper !== 'undefined' && AudioHelper?.play) {
+            const result = await AudioHelper.play({ src: soundPath, volume, autoplay: true, loop }, true);
+            return result;
+        }
+    } catch (e) {}
+    // Fallback manuel
+    const sound = new Audio(soundPath);
+    sound.volume = volume;
+    sound.loop = !!loop;
+    return sound.play();
+}
+
 // Nouvelle fonction pour jouer le son de retour
 function playReturnSound() {
     try {
@@ -2496,18 +2827,11 @@ function playReturnSound() {
         const randomNumber = Math.floor(Math.random() * 19) + 1;
 
         // Construire le chemin du fichier
-        const soundPath = `modules/alien-mu-th-ur/sounds/Key press return/Return_beep_${randomNumber}.wav`;
+        const soundPath = `/modules/alien-mu-th-ur/sounds/Key press return/Return_beep_${randomNumber}.wav`;
 
 
 
-        const sound = new Audio(soundPath);
-        sound.volume = volume;
-
-        sound.onerror = (e) => {
-            console.error("Erreur de chargement du son de retour:", e);
-        };
-
-        return sound.play();
+        return playSoundWithHelper(soundPath, volume, false, 'return');
 
     } catch (error) {
         console.error("Erreur lors de la lecture du son de retour:", error);
@@ -2521,18 +2845,11 @@ function playErrorSound() {
         const volume = game.settings.get('alien-mu-th-ur', 'typingSoundVolume');
 
         // Chemin du fichier d'erreur
-        const soundPath = `modules/alien-mu-th-ur/sounds/pec_message/error.wav`;
+        const soundPath = `/modules/alien-mu-th-ur/sounds/pec_message/error.wav`;
 
 
 
-        const sound = new Audio(soundPath);
-        sound.volume = volume;
-
-        sound.onerror = (e) => {
-            console.error("Erreur de chargement du son d'erreur:", e);
-        };
-
-        return sound.play();
+        return playSoundWithHelper(soundPath, volume, false, 'error');
 
     } catch (error) {
         console.error("Erreur lors de la lecture du son d'erreur:", error);
@@ -2548,18 +2865,11 @@ function playComSound() {
         const randomNumber = Math.floor(Math.random() * 3) + 1;
 
         // Construire le chemin du fichier
-        const soundPath = `modules/alien-mu-th-ur/sounds/pec_message/Save_Sound_Communications_${randomNumber}.wav`;
+        const soundPath = `/modules/alien-mu-th-ur/sounds/pec_message/Save_Sound_Communications_${randomNumber}.wav`;
 
 
 
-        const sound = new Audio(soundPath);
-        sound.volume = volume;
-
-        sound.onerror = (e) => {
-            console.error("Erreur de chargement du son de communication:", e);
-        };
-
-        return sound.play();
+        return playSoundWithHelper(soundPath, volume, false, 'communication');
 
     } catch (error) {
         console.error("Erreur lors de la lecture du son de communication:", error);
@@ -2577,26 +2887,31 @@ async function playReplySound() {
 
         const volume = game.settings.get('alien-mu-th-ur', 'typingSoundVolume');
         const randomNumber = Math.floor(Math.random() * 9) + 1;
-        const soundPath = `modules/alien-mu-th-ur/sounds/reply/Computer_Reply_${randomNumber}.wav`;
+        const soundPath = `/modules/alien-mu-th-ur/sounds/reply/Computer_Reply_${randomNumber}.wav`;
 
 
 
-        currentReplySound = new Audio(soundPath);
-        currentReplySound.volume = volume;
-
-        currentReplySound.onerror = (e) => {
-            console.error("Erreur de chargement du son de réponse:", e);
-            currentReplySound = null;
-        };
-
-        // Ajouter un gestionnaire pour la fin du son
-        currentReplySound.onended = async () => {
-            if (shouldContinueReplySound) {
-                await playReplySound(); // Jouer un nouveau son si on doit continuer
-            }
-        };
-
-        return currentReplySound.play();
+        // Utilise AudioHelper si possible; sinon fallback en boucle manuelle
+        if (typeof AudioHelper !== 'undefined' && AudioHelper?.play) {
+            await AudioHelper.play({ src: soundPath, volume, autoplay: true, loop: false }, true);
+            // Relancer après une durée estimée (valeur moyenne ~900ms) si on continue
+            setTimeout(async () => {
+                if (shouldContinueReplySound) { await playReplySound(); }
+            }, 900);
+            return true;
+        } else {
+            currentReplySound = new Audio(soundPath);
+            currentReplySound.volume = volume;
+            currentReplySound.onended = async () => {
+                if (shouldContinueReplySound) {
+                    await playReplySound(); // Jouer un nouveau son si on doit continuer
+                } else {
+                    /* no-op */
+                }
+            };
+            currentReplySound.onerror = () => { currentReplySound = null; };
+            return currentReplySound.play();
+        }
 
     } catch (error) {
         console.error("Erreur lors de la lecture du son de réponse:", error);
@@ -2607,6 +2922,7 @@ async function playReplySound() {
 function stopReplySound() {
     shouldContinueReplySound = false;
     if (currentReplySound) {
+        try { console.log('MUTHUR Audio | stopReplySound invoked'); } catch(e) {}
         currentReplySound.pause();
         currentReplySound.currentTime = 0;
         currentReplySound = null;
@@ -2621,11 +2937,13 @@ async function displayHackMessage(chatLog, message, color, type, isPassword = fa
     messageDiv.classList.add('message', type);
     chatLog.appendChild(messageDiv);
 
+    const soundGloballyMuted = (window.MUTHUR && window.MUTHUR.muteForSpectator) ? true : false;
+
     if (isPassword) {
         // Affichage instantané pour les mots de passe
         messageDiv.textContent = message;
-        if (game.settings.get('alien-mu-th-ur', 'enableTypingSounds')) {
-            playComSound(); // Son de communication pour les mots de passe
+        if (!soundGloballyMuted && game.settings.get('alien-mu-th-ur', 'enableTypingSounds')) {
+                playComSoundThrottled(); // Son de communication pour les mots de passe
         }
         return Promise.resolve();
     } else {
@@ -2634,8 +2952,8 @@ async function displayHackMessage(chatLog, message, color, type, isPassword = fa
         for (const char of message) {
             displayedText += char;
             messageDiv.textContent = displayedText;
-            if (game.settings.get('alien-mu-th-ur', 'enableTypingSounds') && char === ' ') {
-                playComSound(); // Son de communication périodique
+            if (!soundGloballyMuted && game.settings.get('alien-mu-th-ur', 'enableTypingSounds') && char === ' ') {
+                playComSoundThrottled(); // Son de communication périodique
             }
             await new Promise(resolve => setTimeout(resolve, 20));
         }
@@ -2644,6 +2962,7 @@ async function displayHackMessage(chatLog, message, color, type, isPassword = fa
 }
 
 async function simulateHackingAttempt(chatLog) {
+    try { console.log('MUTHUR | simulateHackingAttempt déclenché (joueur=', !game.user.isGM, ', gm=', game.user.isGM, ')'); } catch(e) {}
 
     if (hackSuccessful) {
         await displayMuthurMessage(
@@ -2657,6 +2976,7 @@ async function simulateHackingAttempt(chatLog) {
     }
 
     const container = document.getElementById('muthur-chat-container');
+    try { console.log('MUTHUR | container chat trouvé côté initiateur =', !!container); } catch(e) {}
     container.classList.add('hacking-active');
 
     // Sauvegarder l'état des sons de frappe
@@ -2818,11 +3138,15 @@ async function simulateHackingAttempt(chatLog) {
         type: 'reply'
     }));
 
+    try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackingAttempt', fromId: game.user.id }); console.log('MUTHUR | hackingAttempt émis aux spectateurs'); } catch(e) { console.warn('MUTHUR | emission hackingAttempt échouée', e); }
     const stopHackingWindows = createHackingWindows();
+    try { console.log('MUTHUR | createHackingWindows() appelée côté initiateur'); } catch(e) {}
     try {
         // Simulation initiale
         for (let i = 0; i < window.hackingSequences.length; i++) {
-            await displayHackMessage(chatLog, window.hackingSequences[i], '#00ff00', 'reply', false);
+            const line = window.hackingSequences[i];
+            await displayHackMessage(chatLog, line, '#00ff00', 'reply', false);
+            try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackStream', text: line, color: '#00ff00', msgType: 'reply', isPassword: false }); } catch(e) {}
             chatLog.scrollTop = chatLog.scrollHeight;
 
             if (!game.user.isGM) {
@@ -2840,6 +3164,7 @@ async function simulateHackingAttempt(chatLog) {
         for (let i = 0; i < passwordAttempts.length; i++) {
             const attempt = passwordAttempts[i];
             await displayHackMessage(chatLog, attempt.text, attempt.color, attempt.type, true);
+            try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackStream', text: attempt.text, color: attempt.color, msgType: attempt.type, isPassword: true }); } catch(e) {}
             chatLog.scrollTop = chatLog.scrollHeight;
 
             if (Math.random() < (i / passwordAttempts.length) * 0.5) {
@@ -2858,7 +3183,9 @@ async function simulateHackingAttempt(chatLog) {
 
         // Suite des séquences
         for (let i = 0; i < window.postPasswordSequences.length; i++) {
-            await displayHackMessage(chatLog, window.postPasswordSequences[i], '#00ff00', 'reply', false);
+            const line = window.postPasswordSequences[i];
+            await displayHackMessage(chatLog, line, '#00ff00', 'reply', false);
+            try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackStream', text: line, color: '#00ff00', msgType: 'reply', isPassword: false }); } catch(e) {}
 
             if (Math.random() < 0.6) {
                 await glitchEffect();
@@ -2880,14 +3207,15 @@ async function simulateHackingAttempt(chatLog) {
         const alertSequences = isSuccess ? window.successSequences : window.failureSequences;
         for (let i = 0; i < alertSequences.length; i++) {
             await new Promise(resolve => setTimeout(resolve, 100));
-            await displayHackMessage(
-                chatLog,
-                game.i18n.localize(alertSequences[i].text),
-                alertSequences[i].color,
-                alertSequences[i].type,
-                false
-            );
+            const txt = game.i18n.localize(alertSequences[i].text);
+            await displayHackMessage(chatLog, txt, alertSequences[i].color, alertSequences[i].type, false);
+            try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackStream', text: txt, color: alertSequences[i].color, msgType: alertSequences[i].type, isPassword: false }); } catch(e) {}
             chatLog.scrollTop = chatLog.scrollHeight;
+
+            // Stopper les glitchs exactement sur "AdminPrivileges"
+            if (alertSequences[i].text === 'MOTHER.AdminPrivileges') {
+                try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackStopGlitch' }); } catch(e) {}
+            }
 
             if (!game.user.isGM) {
                 game.socket.emit('module.alien-mu-th-ur', {
@@ -2899,6 +3227,7 @@ async function simulateHackingAttempt(chatLog) {
 
             if (Math.random() > 0.7) {
                 await glitchEffect();
+                try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackGlitch' }); } catch(e) {}
                 if (game.settings.get('alien-mu-th-ur', 'enableTypingSounds')) {
                     playErrorSound();
                 }
@@ -2915,6 +3244,7 @@ async function simulateHackingAttempt(chatLog) {
                 overlay.style.opacity = '0.8';
                 overlay.style.backgroundColor = 'rgba(255,0,0,0.2)';
                 await glitchEffect();
+                try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackGlitch' }); } catch(e) {}
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
 
@@ -2925,6 +3255,7 @@ async function simulateHackingAttempt(chatLog) {
             // Effet de glitch final
             for (let i = 0; i < 5; i++) {
                 await glitchEffect();
+                try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackGlitch' }); } catch(e) {}
                 await new Promise(resolve => setTimeout(resolve, 200));
             }
 
@@ -2936,7 +3267,7 @@ async function simulateHackingAttempt(chatLog) {
                     fromName: game.user.name
                 });
             }
-            stopHackingWindows();
+            try { stopHackingWindows(); } catch(e) {}
 
             // if (cleanupHackingWindows) {
             //     cleanupHackingWindows();
@@ -2970,6 +3301,7 @@ async function simulateHackingAttempt(chatLog) {
                 color: '#00ff00',
                 type: 'normal'
             });
+            try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackStream', text: game.i18n.localize('MOTHER.WelcomeAdminFull'), color: '#00ff00', msgType: 'normal', isPassword: false }); } catch(e) {}
         }
 
     } finally {
@@ -3364,22 +3696,15 @@ async function handleSpecialOrder(chatLog, command) {
             return;
         }
 
-        // Pour les autres ordres spéciaux
-        await displayHackMessage(
-            chatLog,
-            game.i18n.localize(`${orders[orderKey]}.name`),
-            '#00ff00',
-            'reply',
-            false
-        );
+        // Pour les autres ordres spéciaux (non Cerberus) → synchroniser affichage spectateur
+        const orderName = game.i18n.localize(`${orders[orderKey]}.name`);
+        const orderDesc = game.i18n.localize(`${orders[orderKey]}.description`);
 
-        await displayHackMessage(
-            chatLog,
-            game.i18n.localize(`${orders[orderKey]}.description`),
-            '#00ff00',
-            'reply',
-            false
-        );
+        await displayHackMessage(chatLog, orderName, '#00ff00', 'reply', false);
+        try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackStream', text: orderName, color: '#00ff00', msgType: 'reply', isPassword: false }); } catch(e) {}
+
+        await displayHackMessage(chatLog, orderDesc, '#00ff00', 'reply', false);
+        try { game.socket.emit('module.alien-mu-th-ur', { type: 'hackStream', text: orderDesc, color: '#00ff00', msgType: 'reply', isPassword: false }); } catch(e) {}
     } else {
         await displayHackMessage(
             chatLog,
@@ -3622,7 +3947,7 @@ function createCerberusWindow() {
             font-weight: bold;
             padding: 5px;                      // Ajout d'un peu de padding
             border: 1px solid #ff0000;         // Ajout d'une bordure rouge
-            border-radius: 3px;                // Coins légèrement arrondis
+            border-radius: 3px;
         }
         
         .cerberus-status {

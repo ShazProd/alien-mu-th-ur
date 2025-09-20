@@ -23,6 +23,17 @@
         "selectCharacterHint": "Vælg karakteren der skal kommunikere med MUTHUR",
         "gmInterfaceTitle": "MUTHUR - {userName}",
         "sessionClosedByGM": "MJ har afsluttet MUTHUR sessionen",
+        "selectSpectators": "Vælg Tilskuere",
+        "selectSpectatorsHint": "Vælg spillerne der vil se som tilskuere",
+        "confirmSpectators": "Bekræft",
+        "cancelSpectators": "Annuller",
+        "spectatorModeTitle": "MUTHUR - {userName} (Tilskuer)",
+        "spectatorModeInfo": "Du er i tilskuertilstand. Du kan ikke interagere med MUTHUR.",
+        "spectatorWelcome": "Velkommen til tilskuertilstand. Du observerer {userName}s MUTHUR-session.",
+        "waitingForGM": "Venter på MJ-godkendelse for at starte MUTHUR...",
+        "clickToStart": "Klik for at starte opstartssekvensen",
+        "enableSound": "Aktiver lyd",
+        "enableSoundHint": "Klik for at aktivere lyd for denne session",
         "Time": {
                 "Minute": "minut",
                 "Minutes": "minutter",
@@ -110,7 +121,44 @@
         "HackDetectionMessage": "!!! HACKINGFORSØG OPDAGET AF {userName} !!! - {result}",
         "HackSuccess": "SUCCES",
         "HackFailure": "FEJL",
-        "HackInProgress": "HACKINGFORSØG I GANG"
+        "HackInProgress": "HACKINGFORSØG I GANG",
+        "STATUS": {
+            "current": "Systemstatus",
+            "currentHint": "Vælg status som STATUS-kommandoen returnerer",
+            "customText": "Tilpasset statustekst",
+            "customTextHint": "Tekst der vises når status er 'Tilpasset'",
+            "presets": {
+                "normal": "Normal",
+                "anomalyDetected": "Anomali opdaget",
+                "systemOffline": "System offline",
+                "degradedPerformance": "Nedsat ydeevne",
+                "fireDetected": "Brand opdaget",
+                "quarantine": "Karantæne",
+                "lockdown": "Nedlukning",
+                "intrusion": "Indtrængen opdaget",
+                "networkIssue": "Netværksproblem",
+                "custom": "Tilpasset"
+            },
+            "text": {
+                "normal": "MUTHUR 6000 v2.1.0\nALLE SYSTEMER FUNKTIONELLE\nINGEN ANOMALIER OPDAGET",
+                "anomalyDetected": "MUTHUR 6000 v2.1.0\nANOMALI OPDAGET\nKONTROLLERER DELSYSTEMER",
+                "systemOffline": "MUTHUR 6000 v2.1.0\nADVARSEL: SYSTEM OFFLINE\nTEKNISK INDSATS PÅKRÆVET",
+                "degradedPerformance": "MUTHUR 6000 v2.1.0\nNEDSAT YDEEVNE\nMULIGE FORSINKELSER OG FEJL",
+                "fireDetected": "MUTHUR 6000 v2.1.0\nBRANDALARM\nEVAKUERINGS-PROTOKOLLER ANBEFALES",
+                "quarantine": "MUTHUR 6000 v2.1.0\nKARANTÆNEPROTOKOL AKTIV\nRESTRIKTIONER GÆLDER",
+                "lockdown": "MUTHUR 6000 v2.1.0\nSIKKERHEDS-NEDLUKNING AKTIV\nADGANG BEGRÆNSET",
+                "intrusion": "MUTHUR 6000 v2.1.0\nINDTRÆNGEN OPDAGET\nMODFORANSTALTNINGER AKTIVERES",
+                "networkIssue": "MUTHUR 6000 v2.1.0\nNETVÆRKSANOMALI\nUSTABILE KOMMUNIKATIONER"
+            }
+        },
+        "ROLES": {
+            "captains": "Kaptajner",
+            "captainsHint": "Liste over brugere autoriseret som Kaptajn",
+            "manageCaptains": "Administrer Kaptajner",
+            "captainLabel": "Kaptajner",
+            "allowCaptainOrders": "Kaptajn → Specialordrer uden HACK",
+            "allowCaptainOrdersHint": "Tillad Kaptajner at bruge Specialordrer uden HACK"
+        }
     },
     "MOTHER": {
         "HackSuccess": "HACK LYKKEDES - ADGANG BEVILGET",

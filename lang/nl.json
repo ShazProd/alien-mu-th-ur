@@ -23,6 +23,17 @@
         "selectCharacterHint": "Kies het karakter dat met MUTHUR zal communiceren",
         "gmInterfaceTitle": "MUTHUR - {userName}",
         "sessionClosedByGM": "GM heeft de MUTHUR sessie beëindigd",
+        "selectSpectators": "Selecteer Toeschouwers",
+        "selectSpectatorsHint": "Kies de spelers die als toeschouwers zullen kijken",
+        "confirmSpectators": "Bevestigen",
+        "cancelSpectators": "Annuleren",
+        "spectatorModeTitle": "MUTHUR - {userName} (Toeschouwer)",
+        "spectatorModeInfo": "Je bent in toeschouwersmodus. Je kunt niet met MUTHUR interageren.",
+        "spectatorWelcome": "Welkom in toeschouwersmodus. Je bekijkt de MUTHUR sessie van {userName}.",
+        "waitingForGM": "Wachten op GM-toestemming om MUTHUR te starten...",
+        "clickToStart": "Klik om de opstartsequentie te starten",
+        "enableSound": "Geluid inschakelen",
+        "enableSoundHint": "Klik om het geluid voor deze sessie in te schakelen",
         "Time": {
                 "Minute": "minuut",
                 "Minutes": "minuten",
@@ -110,7 +121,44 @@
         "HackDetectionMessage": "!!! HACKPOGING GEDETECTEERD DOOR {userName} !!! - {result}",
         "HackSuccess": "GESLAAGD",
         "HackFailure": "MISLUKT",
-        "HackInProgress": "HACKPOGING IN UITVOERING"
+        "HackInProgress": "HACKPOGING IN UITVOERING",
+        "STATUS": {
+            "current": "Systeemstatus",
+            "currentHint": "Selecteer de status die door STATUS wordt teruggegeven",
+            "customText": "Aangepaste statustekst",
+            "customTextHint": "Tekst die wordt weergegeven wanneer status 'Aangepast' is",
+            "presets": {
+                "normal": "Normaal",
+                "anomalyDetected": "Anomalie gedetecteerd",
+                "systemOffline": "Systeem offline",
+                "degradedPerformance": "Gedegradeerde prestaties",
+                "fireDetected": "Brand gedetecteerd",
+                "quarantine": "Quarantaine",
+                "lockdown": "Lockdown",
+                "intrusion": "Indringing gedetecteerd",
+                "networkIssue": "Netwerkprobleem",
+                "custom": "Aangepast"
+            },
+            "text": {
+                "normal": "MUTHUR 6000 v2.1.0\nALLE SYSTEMEN FUNCTIONEEL\nGEEN ANOMALIEËN GEDETECTEERD",
+                "anomalyDetected": "MUTHUR 6000 v2.1.0\nANOMALIE GEDETECTEERD\nSUBSYSTEMEN CONTROLEREN",
+                "systemOffline": "MUTHUR 6000 v2.1.0\nWAARSCHUWING: SYSTEEM OFFLINE\nTECHNISCHE INTERVENTIE VEREIST",
+                "degradedPerformance": "MUTHUR 6000 v2.1.0\nGEDEGRADEERDE PRESTATIES\nMOGELIJKE VERTRAGINGEN EN FOUTEN",
+                "fireDetected": "MUTHUR 6000 v2.1.0\nBRANDALARM\nEVACUATIEPROTOCOLLEN AANBEVOLEN",
+                "quarantine": "MUTHUR 6000 v2.1.0\nQUARANTAINEPROTOCOL ACTIEF\nBEPERKINGEN VAN KRACHT",
+                "lockdown": "MUTHUR 6000 v2.1.0\nVEILIGHEIDSLOCKDOWN ACTIEF\nTOEGANG BEPERKT",
+                "intrusion": "MUTHUR 6000 v2.1.0\nINDRINGING GEDETECTEERD\nTEGENMAATREGELEN ACTIEF",
+                "networkIssue": "MUTHUR 6000 v2.1.0\nNETWERKANOMALIE\nONSTABIELE COMMUNICATIE"
+            }
+        },
+        "ROLES": {
+            "captains": "Kapiteins",
+            "captainsHint": "Lijst met gebruikers die als Kapitein zijn gemachtigd",
+            "manageCaptains": "Kapiteins beheren",
+            "captainLabel": "Kapiteins",
+            "allowCaptainOrders": "Kapitein → Speciale orders zonder HACK",
+            "allowCaptainOrdersHint": "Sta Kapiteins toe Speciale Orders te gebruiken zonder HACK"
+        }
     },
     "MOTHER": {
         "HackSuccess": "HACK SUCCESVOL - TOEGANG VERLEEND",

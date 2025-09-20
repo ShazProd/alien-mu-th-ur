@@ -23,6 +23,17 @@
         "selectCharacterHint": "Wählen Sie den Charakter aus, der mit MUTHUR kommunizieren wird",
         "gmInterfaceTitle": "MUTHUR - {userName}",
         "sessionClosedByGM": "MJ hat die MUTHUR-Sitzung beendet",
+        "selectSpectators": "Zuschauer auswählen",
+        "selectSpectatorsHint": "Wählen Sie die Spieler, die als Zuschauer sehen werden",
+        "confirmSpectators": "Bestätigen",
+        "cancelSpectators": "Abbrechen",
+        "spectatorModeTitle": "MUTHUR - {userName} (Zuschauer)",
+        "spectatorModeInfo": "Sie sind im Zuschauermodus. Sie können nicht mit MUTHUR interagieren.",
+        "spectatorWelcome": "Willkommen im Zuschauermodus. Sie beobachten die MUTHUR-Sitzung von {userName}.",
+        "waitingForGM": "Warte auf MJ-Genehmigung, um MUTHUR zu starten...",
+        "clickToStart": "Klicken, um die Boot-Sequenz zu starten",
+        "enableSound": "Ton aktivieren",
+        "enableSoundHint": "Klicken, um den Ton für diese Sitzung zu aktivieren",
         "Time": {
                 "Minute": "Minute",
                 "Minutes": "Minuten",
@@ -110,7 +121,44 @@
         "HackDetectionMessage": "!!! HACKVERSUCH ERKANNT VON {userName} !!! - {result}",
         "HackSuccess": "ERFOLG",
         "HackFailure": "FEHLGESCHLAGEN",
-        "HackInProgress": "HACKVERSUCH LÄUFT"
+        "HackInProgress": "HACKVERSUCH LÄUFT",
+        "STATUS": {
+            "current": "Systemstatus",
+            "currentHint": "Wählen Sie den Status, den der STATUS-Befehl zurückgibt",
+            "customText": "Benutzerdefinierter Statustext",
+            "customTextHint": "Text, wenn der Status auf 'Benutzerdefiniert' gesetzt ist",
+            "presets": {
+                "normal": "Normal",
+                "anomalyDetected": "Anomalie erkannt",
+                "systemOffline": "System offline",
+                "degradedPerformance": "Eingeschränkte Leistung",
+                "fireDetected": "Feuer erkannt",
+                "quarantine": "Quarantäne",
+                "lockdown": "Abriegelung",
+                "intrusion": "Eindringen erkannt",
+                "networkIssue": "Netzwerkproblem",
+                "custom": "Benutzerdefiniert"
+            },
+            "text": {
+                "normal": "MUTHUR 6000 v2.1.0\nALLE SYSTEME FUNKTIONSFÄHIG\nKEINE ANOMALIEN ERKANNT",
+                "anomalyDetected": "MUTHUR 6000 v2.1.0\nANOMALIE ERKANNT\nPRÜFE SUBSYSTEME",
+                "systemOffline": "MUTHUR 6000 v2.1.0\nACHTUNG: SYSTEM OFFLINE\nTECHNISCHER EINGRIFF ERFORDERLICH",
+                "degradedPerformance": "MUTHUR 6000 v2.1.0\nEINGESCHRÄNKTE LEISTUNG\nVERZÖGERUNGEN UND FEHLER MÖGLICH",
+                "fireDetected": "MUTHUR 6000 v2.1.0\nFEUERALARM\nEVAKUIERUNGSPROTOKOLLE EMPFOHLEN",
+                "quarantine": "MUTHUR 6000 v2.1.0\nQUARANTÄNEPROTOKOLL AKTIV\nEINSCHRÄNKUNGEN IN KRAFT",
+                "lockdown": "MUTHUR 6000 v2.1.0\nSICHERHEITSABRIEGELUNG AKTIV\nZUGRIFF BEGRENZT",
+                "intrusion": "MUTHUR 6000 v2.1.0\nEINDRINGEN ERKANNT\nGEGENMASSNAHMEN AKTIV",
+                "networkIssue": "MUTHUR 6000 v2.1.0\nNETZWERKANOMALIE\nINSTABILE KOMMUNIKATION"
+            }
+        },
+        "ROLES": {
+            "captains": "Kapitäne",
+            "captainsHint": "Liste der als Kapitän autorisierten Benutzer",
+            "manageCaptains": "Kapitäne verwalten",
+            "captainLabel": "Kapitäne",
+            "allowCaptainOrders": "Kapitän → Spezialbefehle ohne HACK",
+            "allowCaptainOrdersHint": "Erlaubt Kapitänen den Zugriff auf Spezialbefehle ohne HACK"
+        }
     },
     "MOTHER": {
         "HackSuccess": "HACK ERFOLGREICH - ZUGRIFF GEWÄHRT",

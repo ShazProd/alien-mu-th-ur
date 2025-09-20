@@ -32,6 +32,8 @@
         "spectatorWelcome": "Bienvenue en mode spectateur. Vous observez la session MUTHUR de {userName}.",
         "waitingForGM": "En attente de l'autorisation du MJ pour démarrer MUTHUR...",
         "clickToStart": "Cliquez pour démarrer la séquence de boot",
+        "enableSound": "Activer le son",
+        "enableSoundHint": "Cliquez pour activer le son pour cette session",
         "Time": {
                 "Minute": "minute",
                 "Minutes": "minutes",
@@ -119,7 +121,44 @@
         "HackDetectionMessage": "!!! TENTATIVE DE HACKING DÉTECTÉE PAR {userName} !!! - {result}",
         "HackSuccess": "SUCCÈS",
         "HackFailure": "ÉCHEC",
-        "HackInProgress": "TENTATIVE DE HACK EN COURS"
+        "HackInProgress": "TENTATIVE DE HACK EN COURS",
+        "STATUS": {
+            "current": "Statut système",
+            "currentHint": "Sélectionnez le statut retourné par la commande STATUS",
+            "customText": "Texte de statut personnalisé",
+            "customTextHint": "Saisissez le texte affiché quand le statut est sur 'Personnalisé'",
+            "presets": {
+                "normal": "Normal",
+                "anomalyDetected": "Anomalie détectée",
+                "systemOffline": "Système hors ligne",
+                "degradedPerformance": "Fonctionnement dégradé",
+                "fireDetected": "Incendie détecté",
+                "quarantine": "Quarantaine",
+                "lockdown": "Confinement",
+                "intrusion": "Intrusion détectée",
+                "networkIssue": "Problème réseau",
+                "custom": "Personnalisé"
+            },
+            "text": {
+                "normal": "MUTHUR 6000 v2.1.0\nTOUS LES SYSTÈMES FONCTIONNELS\nAUCUNE ANOMALIE DÉTECTÉE",
+                "anomalyDetected": "MUTHUR 6000 v2.1.0\nANOMALIE DÉTECTÉE\nVÉRIFICATION DES SOUS-SYSTÈMES EN COURS",
+                "systemOffline": "MUTHUR 6000 v2.1.0\nATTENTION: SYSTÈME HORS LIGNE\nINTERVENTION TECHNIQUE REQUISE",
+                "degradedPerformance": "MUTHUR 6000 v2.1.0\nFONCTIONNEMENT DÉGRADÉ\nRETARDS ET ERREURS POSSIBLES",
+                "fireDetected": "MUTHUR 6000 v2.1.0\nALERTE INCENDIE\nPROTOCOLES D'ÉVACUATION RECOMMANDÉS",
+                "quarantine": "MUTHUR 6000 v2.1.0\nPROTOCOLE DE QUARANTAINE ACTIVÉ\nRESTRICTIONS EN VIGUEUR",
+                "lockdown": "MUTHUR 6000 v2.1.0\nCONFINEMENT DE SÉCURITÉ ACTIVÉ\nACCÈS LIMITÉ",
+                "intrusion": "MUTHUR 6000 v2.1.0\nINTRUSION DÉTECTÉE\nCONTRE-MESURES EN COURS",
+                "networkIssue": "MUTHUR 6000 v2.1.0\nANOMALIE RÉSEAU\nCOMMUNICATIONS INSTABLES"
+            }
+        },
+        "ROLES": {
+            "captains": "Capitaines",
+            "captainsHint": "Liste des utilisateurs autorisés comme Capitaines",
+            "manageCaptains": "Gérer les Capitaines",
+            "captainLabel": "Capitaines",
+            "allowCaptainOrders": "Capitaine → Ordres spéciaux sans HACK",
+            "allowCaptainOrdersHint": "Permet aux Capitaines d'accéder aux Ordres Spéciaux sans réussir HACK"
+        }
     },
     "MOTHER": {
         "HackSuccess": "HACK RÉUSSI - ACCÈS ACCORDÉ",

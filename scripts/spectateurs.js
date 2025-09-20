@@ -7,6 +7,9 @@
 Hooks.once('ready', () => {
     console.log("MU/TH/UR | Chargement des corrections pour le mode spectateur");
     
+    // Politique audio spectateur: mêmes règles que le joueur (game.settings)
+    try { window.MUTHUR = window.MUTHUR || {}; window.MUTHUR.muteForSpectator = false; } catch(e) {}
+    
     // Fonction pour mettre à jour les interfaces spectateurs avec un nouveau message
     window.updateSpectatorsWithMessage = function(text, prefix = '', color = '#00ff00', messageType = 'normal') {
         // Envoyer le message à tous les spectateurs via le socket
@@ -270,6 +273,7 @@ Hooks.once('ready', () => {
     
     // Ajouter une fonction pour synchroniser les animations de hack
     window.syncHackingAttempt = function() {
+        try { console.log('MUTHUR Spectator | syncHackingAttempt demandé par initiateur'); } catch(e) {}
         // Informer les spectateurs qu'une tentative de hack est en cours
         game.socket.emit('module.alien-mu-th-ur', {
             type: 'hackingAttempt'
@@ -293,7 +297,13 @@ Hooks.once('ready', () => {
         const spectatorChatLog = document.querySelector('.muthur-spectator-log');
         if (spectatorChatLog) {
             // Créer les fenêtres d'animation de hack
-            createHackingWindows();
+            try {
+                const creator = (window.createHackingWindows || window.parent?.createHackingWindows);
+                if (creator) {
+                    const stopper = creator();
+                    if (stopper) { window.stopHackingWindows = stopper; }
+                }
+            } catch (e) { console.warn('createHackingWindows not available', e); }
             
             // Ajouter la classe hacking-active au conteneur
             const container = document.getElementById('muthur-spectator-container');
@@ -305,7 +315,8 @@ Hooks.once('ready', () => {
             await new Promise(resolve => setTimeout(resolve, 10000));
             
             // Nettoyer les éléments de hacking
-            clearHackingElements();
+            try { if (window.stopHackingWindows) { window.stopHackingWindows(); window.stopHackingWindows = null; } } catch (e) {}
+            try { (window.clearHackingElements || window.parent?.clearHackingElements)?.(); } catch (e) {}
             
             // Retirer la classe hacking-active
             if (container) {
@@ -316,100 +327,92 @@ Hooks.once('ready', () => {
     
     // Écouter les événements socket pour les spectateurs
     game.socket.on('module.alien-mu-th-ur', (data) => {
+        // Effacer le chat côté spectateur lorsque le joueur envoie CLEAR
+        if (data.type === 'clearSpectatorChat' && !game.user.isGM) {
+            try {
+                const spectatorLog = document.querySelector('.muthur-spectator-log');
+                if (spectatorLog) {
+                    spectatorLog.innerHTML = '';
+                }
+            } catch(e) { /* no-op */ }
+        }
+
         // S'assurer que les spectateurs voient la séquence de boot
         if (data.type === 'continueBootSequence' && !game.user.isGM) {
             if (data.spectatorIds && data.spectatorIds.includes(game.user.id)) {
-                // Créer un bouton pour démarrer la séquence de boot (pour contourner les restrictions de lecture automatique)
-                const bootButton = document.createElement('div');
-                bootButton.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background-color: black;
-                    border: 2px solid #00ff00;
-                    padding: 20px;
-                    z-index: 100000;
-                    text-align: center;
-                    font-family: monospace;
-                    cursor: pointer;
-                `;
-                bootButton.innerHTML = `
-                    <h2 style="color: #00ff00; margin-top: 0; font-family: monospace;">
-                        MU/TH/UR 6000
-                    </h2>
-                    <p style="color: #00ff00; font-family: monospace;">
-                        ${game.i18n.localize("MUTHUR.clickToStart") || "Cliquez pour démarrer la séquence de boot"}
-                    </p>
-                `;
-                
-                bootButton.addEventListener('click', () => {
-                    bootButton.remove();
-                    
-                    // Créer un élément pour la séquence Weyland-Yutani
-                    const weylandSequence = document.createElement('div');
-                    weylandSequence.style.cssText = `
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: black;
-                        z-index: 100000;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                        color: white;
-                        font-family: monospace;
-                    `;
-                    
-                    // Logo Weyland-Yutani
-                    const logo = document.createElement('img');
-                    logo.src = 'modules/alien-mu-th-ur/images/weyland.png';
-                    logo.style.cssText = `
-                        max-width: 50%;
-                        margin-bottom: 20px;
-                    `;
-                    weylandSequence.appendChild(logo);
-                    
-                    // Texte "Building Better Worlds"
-                    const tagline = document.createElement('div');
-                    tagline.textContent = "BUILDING BETTER WORLDS";
-                    tagline.style.cssText = `
-                        font-size: 24px;
-                        letter-spacing: 2px;
-                    `;
-                    weylandSequence.appendChild(tagline);
-                    
-                    document.body.appendChild(weylandSequence);
-                    
-                    // Animation de la séquence Weyland-Yutani
-                    setTimeout(() => {
-                        weylandSequence.style.opacity = '0';
-                        weylandSequence.style.transition = 'opacity 1s';
-                        
-                        setTimeout(() => {
-                            weylandSequence.remove();
-                            showBootSequence(true);
-                        }, 1000);
-                    }, 3000);
-                });
-                
-                document.body.appendChild(bootButton);
+                try { (window.showBootSequence || window.parent?.showBootSequence)?.(true); } catch (e) { console.warn('Spectator boot error:', e); }
+                try { window.currentMuthurSession = window.currentMuthurSession || {}; window.currentMuthurSession.spectatorIds = data.spectatorIds; } catch(e) {}
+                // Le son suit les paramètres globaux, aucun prompt d'activation
             }
         }
         
         // Gérer les tentatives de hack pour les spectateurs
         if (data.type === 'hackingAttempt' && !game.user.isGM) {
-            if (currentMuthurSession.spectatorIds && currentMuthurSession.spectatorIds.includes(game.user.id)) {
-                showSpectatorHackingAnimation();
+            try { console.log('MUTHUR Spectator | réception hackingAttempt'); } catch(e) {}
+            try { showSpectatorHackingAnimation(); } catch (e) { console.warn('Spectator hacking animation error:', e); }
+        }
+
+        // Flux texte temps-réel du hack (séquences + mots de passe)
+        if (data.type === 'hackStream' && !game.user.isGM) {
+            const spectatorLog = document.querySelector('.muthur-spectator-log');
+            if (spectatorLog) {
+                try { displayHackMessage(spectatorLog, data.text, data.color || '#00ff00', data.msgType || 'reply', !!data.isPassword); } catch(e) { console.warn('hackStream display error', e); }
+                spectatorLog.scrollTop = spectatorLog.scrollHeight;
             }
+        }
+
+        // Reproduire les glitchs ponctuels du joueur
+        if (data.type === 'hackGlitch' && !game.user.isGM) {
+            try {
+                const container = document.getElementById('muthur-spectator-container');
+                (window.createFullScreenGlitch || window.MUTHUR?.applyScreenGlitch || (()=>{}))(200);
+                if (container && window.MUTHUR?.applyLightGlitch) window.MUTHUR.applyLightGlitch(container, 400);
+            } catch(e) { /* no-op */ }
+        }
+
+        // Arrêt des glitchs exactement au moment AdminPrivileges
+        if (data.type === 'hackStopGlitch' && !game.user.isGM) {
+            try {
+                const container = document.getElementById('muthur-spectator-container');
+                if (container) container.classList.remove('hacking-active');
+                if (window.stopHackingWindows) { window.stopHackingWindows(); window.stopHackingWindows = null; }
+                const overlay = document.getElementById('muthur-glitch-overlay');
+                if (overlay) overlay.remove();
+            } catch(e) {}
+        }
+
+        // Fin du hack: nettoyer les fenêtres/glitches côté spectateur
+        if (data.type === 'hackComplete' && !game.user.isGM) {
+            try {
+                const container = document.getElementById('muthur-spectator-container');
+                if (container) container.classList.remove('hacking-active');
+                (window.clearHackingElements || window.parent?.clearHackingElements)?.();
+                const overlay = document.getElementById('muthur-glitch-overlay');
+                if (overlay) overlay.remove();
+                // Tuer d’éventuels timers anim
+                try { if (window.stopHackingWindows) window.stopHackingWindows(); } catch(e) {}
+
+                // Reproduire l’étape visuelle finale du joueur: vider le chat et fond rouge
+                const spectatorLog = document.querySelector('.muthur-spectator-log');
+                if (spectatorLog) {
+                    spectatorLog.innerHTML = '';
+                    spectatorLog.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+                }
+            } catch(e) { console.warn('Spectator hackComplete cleanup error', e); }
+        }
+        
+        // Fermer l'interface spectateur si la session est clôturée (EXIT côté joueur)
+        if (data.type === 'sessionStatus' && !data.active && !game.user.isGM) {
+            try {
+                const container = document.getElementById('muthur-spectator-container');
+                if (container) container.remove();
+            } catch(e) { /* no-op */ }
         }
         
         // Gérer les résultats des commandes spéciales pour les spectateurs
         if (data.type === 'commandResult' && !game.user.isGM) {
-            if (currentMuthurSession.spectatorIds && currentMuthurSession.spectatorIds.includes(game.user.id)) {
+            try {
+                if (window.currentMuthurSession && window.currentMuthurSession.spectatorIds && window.currentMuthurSession.spectatorIds.includes(game.user.id)) {
                 const spectatorLog = document.querySelector('.muthur-spectator-log');
                 if (spectatorLog) {
                     // Traiter différents types de résultats
@@ -425,6 +428,7 @@ Hooks.once('ready', () => {
                     }
                 }
             }
+            } catch (e) { console.warn('Spectator commandResult sync error:', e); }
         }
         
         // Synchroniser les messages entre le joueur actif et les spectateurs
@@ -467,4 +471,7 @@ Hooks.once('ready', () => {
             }
         }
     });
+
+    // Sons spectateurs: suivent les settings (pas de mute forcé)
+    try { window.MUTHUR = window.MUTHUR || {}; window.MUTHUR.muteForSpectator = false; } catch (e) {}
 });

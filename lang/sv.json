@@ -23,6 +23,17 @@
         "selectCharacterHint": "Välj karaktären som ska kommunicera med MUTHUR",
         "gmInterfaceTitle": "MUTHUR - {userName}",
         "sessionClosedByGM": "GM har avslutat MUTHUR sessionen",
+        "selectSpectators": "Välj Åskådare",
+        "selectSpectatorsHint": "Välj spelarna som kommer att se som åskådare",
+        "confirmSpectators": "Bekräfta",
+        "cancelSpectators": "Avbryt",
+        "spectatorModeTitle": "MUTHUR - {userName} (Åskådare)",
+        "spectatorModeInfo": "Du är i åskådarläge. Du kan inte interagera med MUTHUR.",
+        "spectatorWelcome": "Välkommen till åskådarläge. Du observerar {userName}s MUTHUR-session.",
+        "waitingForGM": "Väntar på GM-godkännande för att starta MUTHUR...",
+        "clickToStart": "Klicka för att starta uppstartssekvensen",
+        "enableSound": "Aktivera ljud",
+        "enableSoundHint": "Klicka för att aktivera ljud för denna session",
         "Time": {
                 "Minute": "minut",
                 "Minutes": "minuter",
@@ -110,7 +121,44 @@
         "HackDetectionMessage": "!!! HACKNINGSFÖRSÖK UPPTÄCKT AV {userName} !!! - {result}",
         "HackSuccess": "LYCKADES",
         "HackFailure": "MISSLYCKADES",
-        "HackInProgress": "HACKNINGSFÖRSÖK PÅGÅR"
+        "HackInProgress": "HACKNINGSFÖRSÖK PÅGÅR",
+        "STATUS": {
+            "current": "Systemstatus",
+            "currentHint": "Välj statusen som STATUS-kommandot returnerar",
+            "customText": "Anpassad statustext",
+            "customTextHint": "Text som visas när status är 'Anpassad'",
+            "presets": {
+                "normal": "Normal",
+                "anomalyDetected": "Avvikelse upptäckt",
+                "systemOffline": "System offline",
+                "degradedPerformance": "Försämrad prestanda",
+                "fireDetected": "Brand upptäckt",
+                "quarantine": "Karantän",
+                "lockdown": "Nedstängning",
+                "intrusion": "Intrång upptäckt",
+                "networkIssue": "Nätverksproblem",
+                "custom": "Anpassad"
+            },
+            "text": {
+                "normal": "MUTHUR 6000 v2.1.0\nALLA SYSTEM FUNGERAR\nINGA AVVIKELSER UPPTÄCKTA",
+                "anomalyDetected": "MUTHUR 6000 v2.1.0\nAVVIKELSE UPPTÄCKT\nKONTROLLERAR DELSYSTEM",
+                "systemOffline": "MUTHUR 6000 v2.1.0\nVARNING: SYSTEM OFFLINE\nTEKNISK ÅTGÄRD KRÄVS",
+                "degradedPerformance": "MUTHUR 6000 v2.1.0\nFÖRSÄMRAD PRESTANDA\nFÖRSENINGAR OCH FEL MÖJLIGA",
+                "fireDetected": "MUTHUR 6000 v2.1.0\nBRANDVARNING\nEVAKUERINGS-PROTOKOLL REKOMMENDERAS",
+                "quarantine": "MUTHUR 6000 v2.1.0\nKARANTÄNPROTOKOLL AKTIVT\nRESTRIKTIONER GÄLLER",
+                "lockdown": "MUTHUR 6000 v2.1.0\nSÄKERHETS-NEDSTÄNGNING AKTIV\nÅTKOMST BEGRÄNSAD",
+                "intrusion": "MUTHUR 6000 v2.1.0\nINTRÅNG UPPTÄCKT\nMOTÅTGÄRDER AKTIVERAS",
+                "networkIssue": "MUTHUR 6000 v2.1.0\nNÄTVERKSAVVIKELSE\nOSTABILA KOMMUNIKATIONER"
+            }
+        },
+        "ROLES": {
+            "captains": "Kaptener",
+            "captainsHint": "Lista över användare som är behöriga som Kaptener",
+            "manageCaptains": "Hantera Kaptener",
+            "captainLabel": "Kaptener",
+            "allowCaptainOrders": "Kapten → Specialorder utan HACK",
+            "allowCaptainOrdersHint": "Tillåt Kaptener att komma åt Specialorder utan HACK"
+        }
     },
     "MOTHER": {
         "HackSuccess": "HACK LYCKADES - ÅTKOMST BEVILJAD",

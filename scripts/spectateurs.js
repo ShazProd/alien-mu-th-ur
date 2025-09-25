@@ -470,8 +470,36 @@ Hooks.once('ready', () => {
                 spectatorLog.scrollTop = spectatorLog.scrollHeight;
             }
         }
+
+        // Fermer toute interface MU/TH/UR côté spectateur lorsque la session est désactivée
+        if (data.type === 'sessionStatus' && !data.active && !game.user.isGM) {
+            try {
+                const container = document.getElementById('muthur-spectator-container');
+                if (container) container.remove();
+            } catch(e) { /* no-op */ }
+        }
     });
 
     // Sons spectateurs: suivent les settings (pas de mute forcé)
     try { window.MUTHUR = window.MUTHUR || {}; window.MUTHUR.muteForSpectator = false; } catch (e) {}
+
+    // Support d'overlay d'alarme pour spectateurs (au cas où l'overlay n'est pas déjà synchronisé)
+    try {
+        window.muthurSpectatorAlarmOn = function(){
+            let ov = document.getElementById('muthur-alarm-overlay');
+            if (!ov) {
+                ov = document.createElement('div');
+                ov.id = 'muthur-alarm-overlay';
+                ov.style.cssText = 'position:fixed; inset:0; background:rgba(255,0,0,0.12); pointer-events:none; z-index:100002; animation: alarmPulse 1s infinite;';
+                const style = document.createElement('style');
+                style.textContent = '@keyframes alarmPulse { 0%{opacity:0.3} 50%{opacity:0.6} 100%{opacity:0.3} }';
+                document.head.appendChild(style);
+                document.body.appendChild(ov);
+            }
+        };
+        window.muthurSpectatorAlarmOff = function(){
+            const ov = document.getElementById('muthur-alarm-overlay');
+            if (ov) ov.remove();
+        };
+    } catch(e) {}
 });

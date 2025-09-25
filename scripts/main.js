@@ -276,8 +276,8 @@ async function showBootSequence(isSpectator = false) {
 try { window.showBootSequence = showBootSequence; } catch (e) {}
 
 
-function startCerberusCountdown() {
-    const duration = game.settings.get('alien-mu-th-ur', 'cerberusDuration');
+function startCerberusCountdown(minutes) {
+    const duration = Number.isFinite(minutes) && minutes > 0 ? minutes : 10;
     let timeLeft = duration * 60; // Convertir les minutes en secondes
 
 
@@ -508,6 +508,7 @@ Hooks.once('init', () => {
     };
 
     // Définition des séquences globales
+    // (réglage alarmSoundPath sera enregistré plus bas, après phAlarm pour l'ordre désiré)
     window.hackingSequences = [
         "> INITIALISATION BRUTE FORCE ATTACK...",
         "ssh -p 22 root@muthur6000.weyland-corp",
@@ -564,6 +565,42 @@ Hooks.once('init', () => {
             );
         }
     });
+
+	// Paramètres Phase Post-Hack: activer/désactiver chaque fonctionnalité et l'affichage dans HELP
+	const phSettings = [
+		{ key: 'phShowInHelp', scope: 'world', type: Boolean, def: true },
+		{ key: 'phSpecialOrders', scope: 'world', type: Boolean, def: true },
+		{ key: 'phCerberus', scope: 'world', type: Boolean, def: true },
+		{ key: 'phDoors', scope: 'world', type: Boolean, def: true },
+		{ key: 'phLights', scope: 'world', type: Boolean, def: true },
+		{ key: 'phAlarm', scope: 'world', type: Boolean, def: true },
+		{ key: 'phGas', scope: 'world', type: Boolean, def: true },
+		{ key: 'phCryo', scope: 'world', type: Boolean, def: true },
+ 
+	];
+	for (const s of phSettings) {
+		game.settings.register('alien-mu-th-ur', s.key, {
+			name: game.i18n.localize(`MUTHUR.SETTINGS.postHack.${s.key}.name`),
+			hint: game.i18n.localize(`MUTHUR.SETTINGS.postHack.${s.key}.hint`),
+			scope: s.scope,
+			config: true,
+			type: s.type,
+			default: s.def
+		});
+	}
+
+    // Réglage sous phAlarm: sélecteur de fichier pour le son d'alarme (GM)
+    try {
+        game.settings.register('alien-mu-th-ur', 'alarmSoundPath', {
+            name: 'MUTHUR – Alarm sound',
+            hint: 'Sélectionnez le son d\'alarme à jouer lors de l\'activation.',
+            scope: 'world',
+            config: true,
+            type: String,
+            default: '/modules/alien-mu-th-ur/sounds/reply/Computer_Reply_1.wav',
+            filePicker: true
+        });
+    } catch (e) {}
 
 
 
@@ -642,48 +679,32 @@ Hooks.once('init', () => {
         restricted: true    // Seul le GM peut le modifier
     });
 
-    game.settings.register('alien-mu-th-ur', 'hackResult', {
-        name: game.i18n.localize("MUTHUR.SETTINGS.hackResult.name"),
-        hint: game.i18n.localize("MUTHUR.SETTINGS.hackResult.hint"),
-        scope: 'world',     // Seul le GM peut le modifier
-        config: true,       // Visible dans le menu des paramètres
-        type: String,
-        choices: {
-            "random": "MUTHUR.SETTINGS.hackResult.random",
-            "success": "MUTHUR.SETTINGS.hackResult.success",
-            "failure": "MUTHUR.SETTINGS.hackResult.failure"
-        },
-        default: "random",
-        restricted: true    // Seul le GM peut le modifier
-    });
-
-    // Ajouter le paramètre pour activer/désactiver Cerberus
-    game.settings.register('alien-mu-th-ur', 'allowCerberus', {
-        name: game.i18n.localize("MUTHUR.SETTINGS.allowCerberus.name"),
-        hint: game.i18n.localize("MUTHUR.SETTINGS.allowCerberus.hint"),
+    // Autoriser le déplacement des terminaux sur la scène
+    game.settings.register('alien-mu-th-ur', 'allowDragGM', {
+        name: game.i18n.localize('MUTHUR.SETTINGS.allowDragGM.name'),
+        hint: game.i18n.localize('MUTHUR.SETTINGS.allowDragGM.hint'),
         scope: 'world',
         config: true,
         type: Boolean,
         default: true,
         restricted: true
     });
-
-
-    // Après game.settings.register('alien-mu-th-ur', 'allowHack', ...)
-    game.settings.register('alien-mu-th-ur', 'cerberusDuration', {
-        name: game.i18n.localize("MUTHUR.SETTINGS.cerberusDuration.name"),
-        hint: game.i18n.localize("MUTHUR.SETTINGS.cerberusDuration.hint"),
-        scope: 'world',     // 'world' signifie que seul le GM peut le modifier
-        config: true,       // Visible dans le menu des paramètres
-        type: Number,
-        range: {
-            min: 1,
-            max: 60,
-            step: 1
-        },
-        default: 5,      // 5 minutes par défaut
-        restricted: true    // Seul le GM peut le modifier
+    game.settings.register('alien-mu-th-ur', 'allowDragPlayers', {
+        name: game.i18n.localize('MUTHUR.SETTINGS.allowDragPlayers.name'),
+        hint: game.i18n.localize('MUTHUR.SETTINGS.allowDragPlayers.hint'),
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+        restricted: true
     });
+
+    // Retiré: réglage 'hackResult' désormais décidé par le MJ au moment du HACK
+
+    // Supprimé: réglage Cerberus (désormais approbation au cas par cas)
+
+
+    // Supprimé: durée Cerberus en réglage (saisie par le MJ au lancement)
 
     // [Roles & Status] Réglages monde (GM uniquement)
     game.settings.register('alien-mu-th-ur', 'currentStatusKey', {
@@ -1014,8 +1035,9 @@ function showMuthurInterface() {
     const sidebar = document.getElementById('sidebar');
     const rightPosition = sidebar ? `${sidebar.offsetWidth + 20}px` : '320px';
 
+    const allowPlayersDrag = (()=>{ try { return game.settings.get('alien-mu-th-ur','allowDragPlayers'); } catch(_) { return false; } })();
     chatContainer.style.cssText = `
-        position: fixed;
+        position: ${allowPlayersDrag ? 'absolute' : 'fixed'};
         bottom: 20px;
         right: ${rightPosition};
         width: 400px;
@@ -1080,6 +1102,31 @@ function showMuthurInterface() {
     chatContainer.appendChild(chatLog);
     chatContainer.appendChild(inputContainer);
     document.body.appendChild(chatContainer);
+
+    // Rendre déplaçable si autorisé pour joueurs/spectateurs
+    try {
+        if (!game.user.isGM && allowPlayersDrag) {
+            let dragging=false, sx=0, sy=0, ox=0, oy=0;
+            const header = (()=> chatContainer.querySelector('.muthur-chat-header'))() || chatContainer;
+            header.style.cursor = 'move';
+            const start=(e)=>{
+                const target = e.target;
+                if (e.button !== undefined && e.button !== 0) return; // seulement clic gauche
+                if (target && target.closest && target.closest('input, textarea, button, select')) return; // ne pas interférer avec la saisie
+                dragging=true;
+                const r=chatContainer.getBoundingClientRect();
+                sx=r.left; sy=r.top;
+                ox=(e.touches?e.touches[0].clientX:e.clientX);
+                oy=(e.touches?e.touches[0].clientY:e.clientY);
+                e.preventDefault();
+            };
+            const move=(e)=>{ if(!dragging) return; const cx=(e.touches?e.touches[0].clientX:e.clientX); const cy=(e.touches?e.touches[0].clientY:e.clientY); chatContainer.style.left=(sx+(cx-ox))+'px'; chatContainer.style.top=(sy+(cy-oy))+'px'; chatContainer.style.right=''; chatContainer.style.bottom=''; };
+            const end=()=>{ dragging=false; };
+            header.addEventListener('mousedown', start); header.addEventListener('touchstart', start, {passive:false});
+            window.addEventListener('mousemove', move); window.addEventListener('touchmove', move, {passive:false});
+            window.addEventListener('mouseup', end); window.addEventListener('touchend', end);
+        }
+    } catch(_) {}
 
     // Afficher le message de bienvenue
     syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.welcome"), '', '#00ff00', 'reply');
@@ -1198,16 +1245,133 @@ function showMuthurInterface() {
             // Délai avant la réponse
             await new Promise(resolve => setTimeout(resolve, 500));
 
-            // Liste des commandes reconnues
+            // Liste des commandes reconnues (de base)
             const knownCommands = ['HACK', 'HELP', 'STATUS', 'CLEAR', 'EXIT'];
 
-            // Vérifier si la commande est reconnue
+            // Vérifier si la commande est reconnue (de base). NB: on NE déclenche plus l'envoi "unknown" ici,
+            // car des commandes avancées (ALARM, GAS, CRYO...) sont traitées plus bas.
             const isKnownCommand = knownCommands.includes(command);
 
-            // Si c'est un joueur et que la commande n'est pas reconnue, envoyer au MJ comme commande inconnue
-            if (!game.user.isGM && !isKnownCommand && !command.startsWith(motherPrefix)) {
-                sendToGM(command, 'command', 'unknown');
+            // Phase 1 — Contrôle des portes et lumières, Seal Deck (avec approbation MJ)
+            // LIST DOORS (affiche uniquement les portes dont le nom/tag commence par "AD")
+            if (/^(LIST\s+DOORS|DOORS)$/.test(command)) {
+                const doors = getDoorsByPrefix('AD');
+                if (!doors.length) {
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.noDoorsFound") || "No doors found.", '', '#00ff00', 'reply');
+                    return;
+                }
+                await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.doorListHeader") || "Doors in area:", '', '#00ff00', 'reply');
+                for (let i = 0; i < doors.length; i++) {
+                    const d = doors[i];
+                    const labelName = getDoorPreferredLabel(d);
+                    if (!labelName) continue; // ne rien afficher si non AD
+                    await displayMuthurMessage(chatLog, `#${i+1} ${labelName}`, '', '#00ff00', 'reply');
+                }
+                return;
             }
+
+            // LOCK/UNLOCK DOOR X
+            let m;
+            if ((m = command.match(/^LOCK\s+DOOR\s+(\d+)$/))) {
+                const index = parseInt(m[1], 10) - 1;
+                if (!hackSuccessful && !game.user.isGM) {
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.permissionDenied") || "ACCESS DENIED.", '', '#ff0000', 'error');
+                    return;
+                }
+                try {
+                    // Indices basés sur la liste filtrée AD
+                    game.socket.emit('module.alien-mu-th-ur', { type: 'doorControlRequest', action: 'LOCK', index, filteredPrefix: 'AD', fromId: game.user.id, fromName: game.user.name });
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.requestSent") || "Request sent to GM...", '', '#00ff00', 'reply');
+                } catch(e) {}
+                return;
+            }
+            if ((m = command.match(/^UNLOCK\s+DOOR\s+(\d+)$/))) {
+                const index = parseInt(m[1], 10) - 1;
+                if (!hackSuccessful && !game.user.isGM) {
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.permissionDenied") || "ACCESS DENIED.", '', '#ff0000', 'error');
+                    return;
+                }
+                try {
+                    game.socket.emit('module.alien-mu-th-ur', { type: 'doorControlRequest', action: 'UNLOCK', index, filteredPrefix: 'AD', fromId: game.user.id, fromName: game.user.name });
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.requestSent") || "Request sent to GM...", '', '#00ff00', 'reply');
+                } catch(e) {}
+                return;
+            }
+
+            // SHUTDOWN/RESTORE LIGHTS (avec sauvegarde/restauration)
+            if (/^SHUTDOWN\s+LIGHTS$/.test(command)) {
+                if (!hackSuccessful && !game.user.isGM) {
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.permissionDenied") || "ACCESS DENIED.", '', '#ff0000', 'error');
+                    return;
+                }
+                try {
+                    game.socket.emit('module.alien-mu-th-ur', { type: 'lightsControlRequest', action: 'SHUTDOWN', fromId: game.user.id, fromName: game.user.name });
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.waitingForMother") || "EN ATTENTE DE MAMAN", '', '#00ff00', 'reply');
+                } catch(e) {}
+                return;
+            }
+            if (/^RESTORE\s+LIGHTS$/.test(command)) {
+                if (!hackSuccessful && !game.user.isGM) {
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.permissionDenied") || "ACCESS DENIED.", '', '#ff0000', 'error');
+                    return;
+                }
+                try {
+                    game.socket.emit('module.alien-mu-th-ur', { type: 'lightsControlRequest', action: 'RESTORE', fromId: game.user.id, fromName: game.user.name });
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.waitingForMother") || "EN ATTENTE DE MAMAN", '', '#00ff00', 'reply');
+                } catch(e) {}
+                return;
+            }
+
+            // SEAL DECK X
+            // (SEAL DECK retiré)
+
+            // Phase 2 — Alarme, Confinement, Scan Zone
+            if (/^(ACTIVATE\s+ALARM|ALARM|ALARME|ACTIV[ÉE]R?\s+ALARME)$/.test(command)) {
+                if (!hackSuccessful && !game.user.isGM) {
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.permissionDenied") || "ACCESS DENIED.", '', '#ff0000', 'error');
+                    return;
+                }
+                try {
+                    game.socket.emit('module.alien-mu-th-ur', { type: 'alarmRequest', fromId: game.user.id, fromName: game.user.name, overlay: true });
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.waitingForMother") || "EN ATTENTE DE MAMAN", '', '#00ff00', 'reply');
+                    try { sendToGM(command, 'command', 'valid'); } catch(_) {}
+                } catch(e) {}
+                return;
+            }
+            // (CONFINEMENT retiré)
+            // (SCAN ZONE retiré)
+
+            // Phase 3 — Systèmes avancés: Gazage, Cryo Pod (config MJ)
+            if ((m = command.match(/^GAS\s+TARGETS?$/))) {
+                if (!hackSuccessful && !game.user.isGM) { await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.permissionDenied") || "ACCESS DENIED.", '', '#ff0000', 'error'); return; }
+                try {
+                    game.socket.emit('module.alien-mu-th-ur', { type: 'gasRequest', fromId: game.user.id, fromName: game.user.name });
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.waitingForMother") || "EN ATTENTE DE MAMAN", '', '#00ff00', 'reply');
+                } catch(e) {}
+                return;
+            }
+            if ((m = command.match(/^CRYO\s+POD(?:\s+(.*))?$/))) {
+                const targetName = (m[1] || '').trim();
+                if (!hackSuccessful && !game.user.isGM) { await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.permissionDenied") || "ACCESS DENIED.", '', '#ff0000', 'error'); return; }
+                try {
+                    game.socket.emit('module.alien-mu-th-ur', { type: 'cryoRequest', targetName, fromId: game.user.id, fromName: game.user.name });
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.waitingForMother") || "EN ATTENTE DE MAMAN", '', '#00ff00', 'reply');
+                } catch(e) {}
+                return;
+            }
+
+            // CRYO RELEASE [ALL]
+            if (/^(CRYO\s+RELEASE|RELEASE\s+CRYO|SORTIR\s+CRYO|RELACHER\s+CRYO|RELÂCHER\s+CRYO)\s*$/.test(command)) {
+                const all = false;
+                if (!hackSuccessful && !game.user.isGM) { await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.permissionDenied") || "ACCESS DENIED.", '', '#ff0000', 'error'); return; }
+                try {
+                    game.socket.emit('module.alien-mu-th-ur', { type: 'cryoReleaseRequest', all, fromId: game.user.id, fromName: game.user.name });
+                    await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.waitingForMother") || "EN ATTENTE DE MAMAN", '', '#00ff00', 'reply');
+                } catch(e) {}
+                return;
+            }
+
+            // Dépressurisation DISABLED
 
             switch (command) {
                 case 'HACK':
@@ -1231,6 +1395,13 @@ function showMuthurInterface() {
                     break;
                 case 'HELP':
                     await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.help"), '', '#00ff00', 'reply');
+                    // Après HACK: optionnellement ajouter les nouvelles commandes au HELP
+                    if (hackSuccessful && game.settings.get('alien-mu-th-ur', 'phShowInHelp')) {
+                        const extra = buildPostHackHelpList();
+                        if (extra) {
+                            await syncMessageToSpectators(chatLog, extra, '', '#00ff00', 'reply');
+                        }
+                    }
                     // Si c'est un joueur, envoyer au MJ comme commande valide
                     if (!game.user.isGM) {
                         sendToGM(command, 'command', 'valid');
@@ -1244,6 +1415,8 @@ function showMuthurInterface() {
                             fromId: game.user.id,
                             fromName: game.user.name
                         });
+                        // Afficher aussi la ligne du joueur chez le MJ
+                        try { sendToGM(command, 'command', 'valid'); } catch(e) {}
                         await displayMuthurMessage(
                             chatLog,
                             game.i18n.localize('MUTHUR.waitingResponse'),
@@ -1315,6 +1488,9 @@ function showMuthurInterface() {
                     return;
                 default:
                     if (!command.startsWith(motherPrefix)) {
+                        // Envoyer au MJ comme commande inconnue (une seule fois, après tous les handlers)
+                        if (!game.user.isGM) { try { sendToGM(command, 'command', 'unknown'); } catch(_) {}
+                        }
                         await syncMessageToSpectators(chatLog, game.i18n.localize("MUTHUR.commandNotFound"), '', '#00ff00', 'error');
                     }
             }
@@ -1327,6 +1503,8 @@ function showMuthurInterface() {
         if (soundEnabled) { playTypeSound(); }
 
         if (event.key === 'Enter' || event.key === 'NumpadEnter') {
+            event.stopPropagation();
+            event.preventDefault();
             await handleCommand();
         }
     });
@@ -1529,7 +1707,7 @@ function createGMMuthurInterface(userName, userId) {
     const rightPosition = sidebar ? `${sidebar.offsetWidth + 20}px` : '320px';
 
     container.style.cssText = `
-        position: fixed;
+        position: ${game.settings.get('alien-mu-th-ur','allowDragGM') ? 'absolute' : 'fixed'};
         bottom: 20px;
         right: ${document.getElementById('sidebar').offsetWidth + 20}px;
         width: 400px;
@@ -1561,6 +1739,110 @@ function createGMMuthurInterface(userName, userId) {
         font-size: 16px;
     `;
     
+    // Bouton d'aide "?" pour ouvrir/fermer le panneau latéral
+    const helpButton = document.createElement('button');
+    helpButton.textContent = '?';
+    helpButton.title = game.i18n.localize('MUTHUR.helpMenu.tooltip') || 'Commands Help';
+    helpButton.style.cssText = `
+        background: black;
+        border: 1px solid #ff9900;
+        color: #ff9900;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-family: monospace;
+        padding: 0;
+        line-height: 1;
+        margin-right: 6px;
+    `;
+
+    function buildGMHelpPanelContent() {
+        const lines = [];
+        const g = (k)=>{ try { return game.settings.get('alien-mu-th-ur', k); } catch(e) { return false; } };
+        const sec = (k)=>({
+            title: game.i18n.localize(`MUTHUR.helpMenu.sections.${k}.title`) || k.toUpperCase(),
+            desc: game.i18n.localize(`MUTHUR.helpMenu.sections.${k}.desc`) || ''
+        });
+        const intro = game.i18n.localize('MUTHUR.helpMenu.sections.intro') || '';
+        if (intro) lines.push(`<div style="margin:0 0 8px 0; opacity:0.9;">${intro}</div>`);
+        // Commandes de base (toujours visibles)
+        const basic = sec('basic');
+        lines.push(`<div style=\"margin:6px 0 2px 0; font-weight:bold;\">${basic.title}</div><div style=\"white-space:pre-wrap;\">${basic.desc}</div>`);
+        // Hack (toujours visible)
+        const hack = sec('hack');
+        lines.push(`<div style=\"margin:6px 0 2px 0; font-weight:bold;\">${hack.title}</div><div style=\"white-space:pre-wrap;\">${hack.desc}</div>`);
+        if (g('phSpecialOrders')) { const s = sec('specialOrders'); lines.push(`<div style="margin:6px 0 2px 0; font-weight:bold;">${s.title}</div><div>${s.desc}</div>`); }
+        { const s = sec('cerberus'); lines.push(`<div style=\"margin:6px 0 2px 0; font-weight:bold;\">${s.title}</div><div>${s.desc}</div>`); }
+        if (g('phDoors'))         { const s = sec('doors');         lines.push(`<div style=\"margin:6px 0 2px 0; font-weight:bold;\">${s.title}</div><div>${s.desc}</div>`); }
+        if (g('phLights'))        { const s = sec('lights');        lines.push(`<div style=\"margin:6px 0 2px 0; font-weight:bold;\">${s.title}</div><div>${s.desc}</div>`); }
+        if (g('phAlarm'))         { const s = sec('alarm');         lines.push(`<div style=\"margin:6px 0 2px 0; font-weight:bold;\">${s.title}</div><div>${s.desc}</div>`); }
+        if (g('phGas'))           { const s = sec('gas');           lines.push(`<div style=\"margin:6px 0 2px 0; font-weight:bold;\">${s.title}</div><div>${s.desc}</div>`); }
+        if (g('phCryo'))          { const s1 = sec('cryo');         lines.push(`<div style=\"margin:6px 0 2px 0; font-weight:bold;\">${s1.title}</div><div>${s1.desc}</div>`);
+                                     const s2 = sec('cryoRelease'); lines.push(`<div style=\"margin:6px 0 2px 0; font-weight:bold;\">${s2.title}</div><div>${s2.desc}</div>`); }
+
+        // Détail des Ordres Spéciaux (noms + descriptions localisés)
+        if (g('phSpecialOrders')) {
+            const orderCodes = ['754','899','931','937','939','966'];
+            const items = orderCodes.map(code => {
+                const name = game.i18n.localize(`MOTHER.SpecialOrders.${code}.name`) || code;
+                const desc = game.i18n.localize(`MOTHER.SpecialOrders.${code}.description`) || '';
+                return `<div style=\"margin:4px 0;\"><div style=\"font-weight:bold;\">${name}</div><div>${desc}</div></div>`;
+            }).join('');
+            lines.push(items);
+        }
+        return lines.join('<hr style="border-color:#333; border-width:1px 0 0; margin:8px 0;">');
+    }
+
+    function toggleGMHelpPanel() {
+        const existing = document.getElementById('gm-muthur-help-panel');
+        if (existing) { existing.remove(); return; }
+        const panel = document.createElement('div');
+        panel.id = 'gm-muthur-help-panel';
+        const comp = window.getComputedStyle(container);
+        const containerRight = parseInt(comp.right) || 320;
+        const panelRight = containerRight + container.offsetWidth + 10;
+        panel.style.cssText = `
+            position: fixed;
+            bottom: ${comp.bottom || '20px'};
+            right: ${panelRight}px;
+            width: 360px;
+            height: ${container.offsetHeight || 600}px;
+            background: black;
+            border: 2px solid #ff9900;
+            padding: 10px;
+            font-family: monospace;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+        `;
+
+        const header = document.createElement('div');
+        header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;';
+        const title = document.createElement('div');
+        title.textContent = game.i18n.localize('MUTHUR.helpMenu.title') || 'MUTHUR - HELP';
+        title.style.cssText = 'color:#ff9900; font-weight:bold; font-size:16px;';
+        const close = document.createElement('button');
+        close.innerHTML = '&#10006;';
+        close.title = game.i18n.localize('MUTHUR.helpMenu.close') || 'Close';
+        close.style.cssText = 'background:black; border:1px solid #ff9900; color:#ff9900; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; line-height:1;';
+        close.addEventListener('click', ()=> panel.remove());
+        header.appendChild(title);
+        header.appendChild(close);
+
+        const body = document.createElement('div');
+        body.style.cssText = 'flex:1; overflow:auto; color:#ff9900;';
+        body.innerHTML = buildGMHelpPanelContent();
+
+        panel.appendChild(header);
+        panel.appendChild(body);
+        document.body.appendChild(panel);
+    }
+
+    helpButton.addEventListener('click', toggleGMHelpPanel);
+    
     const closeButton = document.createElement('button');
     closeButton.innerHTML = '&#10006;'; // Symbole X
     closeButton.style.cssText = `
@@ -1589,11 +1871,72 @@ function createGMMuthurInterface(userName, userId) {
             type: 'closePlayerInterface',
             targetUserId: userId
         });
+
+        // Fermer également chez tous les spectateurs via l’état de session
+        try {
+            game.socket.emit('module.alien-mu-th-ur', {
+                type: 'sessionStatus',
+                active: false,
+                userId: currentMuthurSession?.userId || userId,
+                userName: currentMuthurSession?.userName || ''
+            });
+        } catch (e) { /* no-op */ }
     });
     
+    const rightControls = document.createElement('div');
+    rightControls.style.cssText = 'display:flex; align-items:center; gap:0;';
+
+    // Bouton STOP ALARM (caché par défaut) à gauche de "?"
+    const stopAlarmBtn = document.createElement('button');
+    stopAlarmBtn.id = 'gm-muthur-stop-alarm-btn';
+    const stopLbl = game.i18n.localize('MUTHUR.stopAlarm');
+    stopAlarmBtn.textContent = (stopLbl && stopLbl !== 'MUTHUR.stopAlarm') ? stopLbl : 'STOP ALARME';
+    stopAlarmBtn.title = (stopLbl && stopLbl !== 'MUTHUR.stopAlarm') ? stopLbl : 'STOP ALARME';
+    stopAlarmBtn.style.cssText = `
+        background: black;
+        border: 1px solid #ff0000;
+        color: #ff0000;
+        height: 24px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-family: monospace;
+        padding: 0 6px;
+        line-height: 1;
+        margin-right: 6px;
+    `;
+    stopAlarmBtn.onclick = () => {
+        console.log('[MUTHUR][ALARM] GM clicked STOP. Stopping locally and emitting universal command.');
+        try { stopAlarm(); } catch (e) { console.warn('[MUTHUR][ALARM] local stop error:', e); }
+        try {
+            game.socket.emit('module.alien-mu-th-ur', { type: 'alarmControl', action: 'off' });
+        } catch (e) {
+            console.warn('[MUTHUR][ALARM] emit off error:', e);
+        }
+    };
+
+    helpButton.style.marginRight = '0';
+    rightControls.appendChild(stopAlarmBtn);
+    rightControls.appendChild(helpButton);
+    rightControls.appendChild(closeButton);
     headerContainer.appendChild(headerTitle);
-    headerContainer.appendChild(closeButton);
+    headerContainer.appendChild(rightControls);
     container.appendChild(headerContainer);
+
+    // Rendre le conteneur déplaçable si autorisé pour le GM
+    try {
+        if (game.settings.get('alien-mu-th-ur','allowDragGM')) {
+            let isDragging = false; let ox=0; let oy=0; let sx=0; let sy=0;
+            const startDrag = (e)=>{ isDragging = true; const r = container.getBoundingClientRect(); sx = r.left; sy = r.top; ox = (e.touches?e.touches[0].clientX:e.clientX); oy = (e.touches?e.touches[0].clientY:e.clientY); e.preventDefault(); };
+            const onMove = (e)=>{ if(!isDragging) return; const cx = (e.touches?e.touches[0].clientX:e.clientX); const cy = (e.touches?e.touches[0].clientY:e.clientY); container.style.left = (sx + (cx-ox)) + 'px'; container.style.top = (sy + (cy-oy)) + 'px'; container.style.right=''; container.style.bottom=''; };
+            const endDrag = ()=>{ isDragging = false; };
+            headerContainer.style.cursor = 'move';
+            headerContainer.addEventListener('mousedown', startDrag); headerContainer.addEventListener('touchstart', startDrag, {passive:false});
+            window.addEventListener('mousemove', onMove); window.addEventListener('touchmove', onMove, {passive:false});
+            window.addEventListener('mouseup', endDrag); window.addEventListener('touchend', endDrag);
+        }
+    } catch(_) {}
 
     // Création de la zone de chat
     const chatLog = document.createElement('div');
@@ -2141,16 +2484,17 @@ function showSpectatorInterface(activeUserId, activeUserName, skipWelcomeMessage
 }
 
 // Exposer quelques API nécessaires aux spectateurs
-try {
-    window.displayMuthurMessage = displayMuthurMessage;
-    window.displayHackMessage = displayHackMessage;
-    window.updateSpectatorsWithMessage = updateSpectatorsWithMessage;
-    window.syncMessageToSpectators = syncMessageToSpectators;
-    window.showSpectatorInterface = showSpectatorInterface;
-    window.currentMuthurSession = currentMuthurSession;
-    window.createHackingWindows = createHackingWindows;
-    window.clearHackingElements = clearHackingElements;
-} catch (e) {}
+    try {
+        window.displayMuthurMessage = displayMuthurMessage;
+        window.displayHackMessage = displayHackMessage;
+        window.updateSpectatorsWithMessage = updateSpectatorsWithMessage;
+        window.syncMessageToSpectators = syncMessageToSpectators;
+        window.showSpectatorInterface = showSpectatorInterface;
+        window.currentMuthurSession = currentMuthurSession;
+        window.createHackingWindows = createHackingWindows;
+        window.clearHackingElements = clearHackingElements;
+        window.stopAlarm = stopAlarm;
+    } catch (e) {}
 
 // Fonction de réception modifiée
 async function handleMuthurResponse(data) {
@@ -2217,23 +2561,23 @@ async function handleMuthurResponse(data) {
 
     // Gestion normale des autres messages
     // Faire la distinction entre les différents types de commandes
+    const playerColor = '#00ff00';
     if (data.commandType === 'm') {
-        // Si c'est une commande /m, afficher le préfixe /m
-        await displayMuthurMessage(chatLog, `${data.user}: ${game.i18n.localize("MUTHUR.motherPrefix")} ${data.command}`, '', '#ff9900');
+        await displayMuthurMessage(chatLog, `${data.user}: ${game.i18n.localize("MUTHUR.motherPrefix")} ${data.command}`, '', playerColor);
     } else if (data.commandType === 'unknown') {
-        // Si c'est une commande inconnue, afficher "COMMANDE INCONNUE"
-        await displayMuthurMessage(chatLog, `${data.user}: ${game.i18n.localize("MUTHUR.unknownCommandPrefix")} ${data.command}`, '', '#ff9900');
+        await displayMuthurMessage(chatLog, `${data.user}: ${game.i18n.localize("MUTHUR.unknownCommandPrefix")} ${data.command}`, '', playerColor);
     } else if (data.commandType === 'valid') {
-        // Si c'est une commande valide, afficher sans préfixe spécial
-        await displayMuthurMessage(chatLog, `${data.user}: ${data.command}`, '', '#ff9900');
+        await displayMuthurMessage(chatLog, `${data.user}: ${data.command}`, '', playerColor);
     } else {
-        // Pour tout autre type, afficher sans préfixe spécial
-        await displayMuthurMessage(chatLog, `${data.user}: ${data.command}`, '', '#ff9900');
+        await displayMuthurMessage(chatLog, `${data.user}: ${data.command}`, '', playerColor);
     }
 
     // Gestion des actions spéciales
     if (data.actionType === 'open') {
-        await displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.newSessionStarted"), '', '#ff9900');
+        const consult = game.i18n.localize('MUTHUR.helpMenu.consultHint') || '';
+        if (consult) {
+            await displayMuthurMessage(chatLog, consult, '', '#ff9900', 'reply');
+        }
     } else if (data.actionType === 'close') {
         await displayMuthurMessage(chatLog, game.i18n.localize("MUTHUR.muthurSessionEnded"), '', '#ff9900');
         setTimeout(() => gmContainer.remove(), 2000);
@@ -2501,13 +2845,66 @@ Hooks.once('ready', async () => {
                 currentMuthurSession.userName = null;
             }
 
+        } else if (data.type === 'cerberusApprovalRequest' && game.user.isGM) {
+            // MJ: approuve/annule + saisie des minutes
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'background:black; border:2px solid #ff0000; color:#ff0000; padding:10px; z-index:100006; font-family:monospace; min-width:260px;';
+            const t = document.createElement('div'); t.textContent = `${data.fromName} → CERBERUS ?`; t.style.cssText = 'font-weight:bold; margin-bottom:6px;'; wrap.appendChild(t);
+            const row = document.createElement('div'); row.style.cssText = 'display:flex; gap:6px; align-items:center; margin-bottom:6px;';
+            const lbl = document.createElement('label'); lbl.textContent = 'Minutes:'; lbl.style.minWidth = '70px';
+            const inp = document.createElement('input'); inp.type = 'number'; inp.min = '1'; inp.max = '60'; inp.value = '10'; inp.style.cssText = 'width:70px; background:black; color:#ff0000; border:1px solid #ff0000; padding:2px 4px;';
+            row.appendChild(lbl); row.appendChild(inp); wrap.appendChild(row);
+            const ok = document.createElement('button'); ok.textContent = 'OK'; ok.style.cssText = 'background:black; color:#00ff00; border:1px solid #00ff00; padding:4px 10px; margin-right:6px;';
+            const ko = document.createElement('button'); ko.textContent = 'X'; ko.style.cssText = 'background:black; color:#ff0000; border:1px solid #ff0000; padding:4px 10px;';
+            wrap.appendChild(ok); wrap.appendChild(ko);
+            appendDialogToGM(wrap, 'bottom-right', 8);
+            ok.onclick = ()=>{ const m = Math.max(1, Math.min(60, parseInt(inp.value, 10) || 10)); try { game.socket.emit('module.alien-mu-th-ur', { type: 'cerberusApproval', targetUserId: data.fromId, approved: true, minutes: m }); } catch(_) {} wrap.remove(); };
+            ko.onclick = ()=>{ try { game.socket.emit('module.alien-mu-th-ur', { type: 'cerberusApproval', targetUserId: data.fromId, approved: false }); } catch(_) {} wrap.remove(); };
+        } else if (data.type === 'cerberusApproval' && data.targetUserId === game.user.id) {
+            // Joueur reçoit la décision du MJ
+            if (!data.approved) {
+                const chatLog = document.querySelector('.muthur-chat-log'); if (chatLog) displayMuthurMessage(chatLog, game.i18n.localize('MUTHUR.requestDenied') || 'Request denied.', '', '#00ff00', 'reply');
+                return;
+            }
+            window.__cerberusDurationMinutes = Math.max(1, Math.min(60, parseInt(data.minutes, 10) || 10));
+            // Afficher confirmation locale au joueur (déjà gérée dans handleSpecialOrder → confirmation), rien à faire ici
+            const chatLog = document.querySelector('.muthur-chat-log');
+            if (chatLog) {
+                const warningText = game.i18n.localize('MOTHER.SpecialOrders.Cerberus.confirmation');
+                const maybe = displayMuthurMessage(chatLog, warningText, '', '#ff0000', 'error');
+                // Spectateurs: afficher aussi l’avertissement (sans boutons)
+                try { updateSpectatorsWithMessage(warningText, `${game.i18n.localize('MUTHUR.motherName')}: `, '#ff0000', 'error'); } catch(_) {}
+                const injectButtons = () => {
+                    const ui = document.createElement('div');
+                    ui.style.cssText = 'display:flex; gap:8px; justify-content:center; margin:10px 0;';
+                    const yesBtn = document.createElement('button'); yesBtn.textContent = game.i18n.localize('MOTHER.SpecialOrders.Cerberus.confirm'); yesBtn.style.cssText = 'background:black; color:#ff3333; border:1px solid #ff3333; padding:4px 10px;';
+                    const noBtn = document.createElement('button'); noBtn.textContent = game.i18n.localize('MOTHER.SpecialOrders.Cerberus.cancel'); noBtn.style.cssText = 'background:black; color:#33ff33; border:1px solid #33ff33; padding:4px 10px;';
+                    ui.appendChild(yesBtn); ui.appendChild(noBtn); chatLog.appendChild(ui);
+                    yesBtn.onclick = async ()=>{
+                        ui.remove();
+                        try { await displayMuthurMessage(chatLog, game.i18n.localize('MOTHER.CerberusConfirmed'), '', '#ff0000', 'error'); } catch(_) {}
+                        try {
+                            createCerberusWindow();
+                            startCerberusCountdown(window.__cerberusDurationMinutes || 10);
+                            game.socket.emit('module.alien-mu-th-ur', { type: 'showCerberusGlobal', fromId: game.user.id, fromName: game.user.name, minutes: window.__cerberusDurationMinutes || 10, startTime: Date.now() });
+                        } catch(_) {}
+                    };
+                    noBtn.onclick = async ()=>{
+                        ui.remove();
+                        try { await displayMuthurMessage(chatLog, game.i18n.localize('MOTHER.CerberusCancelled'), '', '#00ff00', 'reply'); } catch(_) {}
+                    };
+                };
+                if (maybe && typeof maybe.then === 'function') { maybe.then(()=> setTimeout(injectButtons, 10)); }
+                else { setTimeout(injectButtons, 0); }
+            }
         } else if (data.type === 'showCerberusGlobal') {
 
 
             // Ne pas créer de nouvelles fenêtres pour l'initiateur
             if (data.fromId !== game.user.id) {
+                window.__cerberusDurationMinutes = Math.max(1, Math.min(60, parseInt(data.minutes, 10) || 10));
                 createCerberusWindow();
-                startCerberusCountdown();
+                startCerberusCountdown(window.__cerberusDurationMinutes);
             }
 
         } else if (data.type === 'stopCerberus') {  // Ajouter ici
@@ -2592,7 +2989,7 @@ Hooks.once('ready', async () => {
 
             const picker = document.createElement('div');
             picker.style.cssText = `
-                position: fixed; bottom: 90px; right: 20px; background: black; border: 2px solid #ff9900; padding: 8px; z-index: 100003; color: #ff9900; min-width: 260px;
+                background: black; border: 2px solid #ff9900; padding: 8px; z-index: 100003; color: #ff9900; min-width: 260px;
             `;
             const title = document.createElement('div');
             title.textContent = `${game.i18n.localize('MUTHUR.STATUS.current')} - ${requesterName}`;
@@ -2647,9 +3044,9 @@ Hooks.once('ready', async () => {
             cancel.style.cssText = 'float:right; background:black; border:1px solid #ff9900; color:#ff9900; padding:4px 8px; margin-left:6px; cursor:pointer;';
             cancel.addEventListener('click', ()=>picker.remove());
             picker.appendChild(cancel);
-            document.body.appendChild(picker);
+            appendDialogToGM(picker, 'bottom-right', 8);
 
-        } else if (data.type === 'statusResponse' && data.targetUserId === game.user.id) {
+		} else if (data.type === 'statusResponse' && data.targetUserId === game.user.id) {
             const chatLog = document.querySelector('.muthur-chat-log');
             if (chatLog) {
                 const maybePromise = displayMuthurMessage(chatLog, data.text, '', '#00ff00', 'reply');
@@ -2668,16 +3065,195 @@ Hooks.once('ready', async () => {
                     } catch (e) { /* noop */ }
                 };
                 if (maybePromise && typeof maybePromise.then === 'function') {
-                    maybePromise.then((div)=>{ handleGlitch(div); if (data.statusKey === 'degradedPerformance') window.MUTHUR.applyScreenGlitch(1200); try{ const spectatorLog = document.querySelector('.muthur-spectator-log'); if (spectatorLog) displayMuthurMessage(spectatorLog, data.text, '', '#00ff00', 'reply'); }catch(e){} broadcastToSpectators(); });
+                    maybePromise.then((div)=>{ handleGlitch(div); if (data.statusKey === 'degradedPerformance') window.MUTHUR.applyScreenGlitch(1200); broadcastToSpectators(); });
                 } else {
                     handleGlitch(maybePromise);
                     if (data.statusKey === 'degradedPerformance') window.MUTHUR.applyScreenGlitch(1200);
-                    try{ const spectatorLog = document.querySelector('.muthur-spectator-log'); if (spectatorLog) displayMuthurMessage(spectatorLog, data.text, '', '#00ff00', 'reply'); }catch(e){}
                     broadcastToSpectators();
                 }
             }
+		// Phase 1 — demandes côté joueur, approbation et exécution côté MJ
+        } else if (data.type === 'doorControlRequest' && game.user.isGM) {
+            const doors = data.filteredPrefix ? getDoorsByPrefix(data.filteredPrefix) : getSortedDoorDocuments();
+			const idx = Math.max(0, Math.min(doors.length - 1, data.index || 0));
+			const target = doors[idx];
+            const pref = getDoorPreferredLabel(target) || `Door #${idx+1}`;
+            const approvText = data.action === 'LOCK'
+                ? game.i18n.format('MUTHUR.approve.lockDoor', { label: pref })
+                : game.i18n.format('MUTHUR.approve.unlockDoor', { label: pref });
+            showApprovalDialog(approvText, async (approved) => {
+				if (!approved) {
+					notifyBackToRequester(data.fromId, game.i18n.localize('MUTHUR.requestDenied') || 'Request denied.', '#ff0000');
+					return;
+				}
+				await applyDoorAction(target, data.action);
+                const msg = data.action === 'LOCK'
+                    ? game.i18n.format('MUTHUR.doorLocked', { label: pref })
+                    : game.i18n.format('MUTHUR.doorUnlocked', { label: pref });
+				notifyBackToRequester(data.fromId, msg, '#00ff00');
+				broadcastToSpectators(msg, '#00ff00');
+			});
+		} else if (data.type === 'lightsControlRequest' && game.user.isGM) {
+            const approvMap = { DIM: 'MUTHUR.approve.dimLights', SHUTDOWN: 'MUTHUR.approve.shutdownLights', RESTORE: 'MUTHUR.approve.restoreLights' };
+            const approvText = game.i18n.localize(approvMap[data.action] || 'MUTHUR.approve.dimLights');
+            showApprovalDialog(approvText, async (approved) => {
+				if (!approved) {
+					notifyBackToRequester(data.fromId, game.i18n.localize('MUTHUR.requestDenied') || 'Request denied.', '#ff0000');
+					return;
+				}
+				const msg = await applyLightsAction(data.action);
+				notifyBackToRequester(data.fromId, msg, '#00ff00');
+				broadcastToSpectators(msg, '#00ff00');
+			});
+        } else if (data.type === 'alarmRequest' && game.user.isGM) {
+            showApprovalDialog(game.i18n.localize('MUTHUR.approve.activateAlarm'), async (approved) => {
+				if (!approved) { notifyBackToRequester(data.fromId, game.i18n.localize('MUTHUR.requestDenied') || 'Request denied.', '#ff0000'); return; }
+                const msg = game.i18n.localize('MUTHUR.alarmActivated');
+                notifyBackToRequester(data.fromId, msg, '#ff0000');
+                broadcastToSpectators(msg, '#ff0000');
+                // Démarrer immédiatement l'alarme côté MJ
+                try { triggerAlarm(true); } catch(e) { console.warn('[MUTHUR][ALARM] local trigger error:', e); }
+                // Demander aux spectateurs d'afficher l'overlay si besoin
+                try { console.log('[MUTHUR][ALARM] emit alarmControl:on'); game.socket.emit('module.alien-mu-th-ur', { type: 'alarmControl', action: 'on' }); } catch(e) { console.warn('[MUTHUR][ALARM] emit on error:', e); }
+                // Afficher le bouton STOP en header (à gauche de "?")
+                try {
+                    const headerStopBtn = document.getElementById('gm-muthur-stop-alarm-btn');
+                    if (headerStopBtn) headerStopBtn.style.display = 'flex';
+                } catch(_) {}
+			});
+        } else if (data.type === 'hackDecisionRequest' && game.user.isGM) {
+            // Petite fenêtre pour que le MJ décide succès/échec
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'background:black; border:2px solid #ff9900; color:#ff9900; padding:10px; z-index:100005; font-family:monospace;';
+            const title = document.createElement('div');
+            title.textContent = `${data.fromName || 'PLAYER'} → HACK ?`;
+            title.style.cssText = 'margin-bottom:6px; font-weight:bold;';
+            const ok = document.createElement('button'); ok.textContent = 'SUCCÈS'; ok.style.cssText = 'background:black; color:#00ff00; border:1px solid #00ff00; padding:4px 10px; margin-right:6px;';
+            const ko = document.createElement('button'); ko.textContent = 'ÉCHEC'; ko.style.cssText = 'background:black; color:#ff0000; border:1px solid #ff0000; padding:4px 10px;';
+            wrap.appendChild(title); wrap.appendChild(ok); wrap.appendChild(ko);
+            appendDialogToGM(wrap, 'bottom-right', 8);
+            const decide = (success)=>{
+                wrap.remove();
+                game.socket.emit('module.alien-mu-th-ur', { type: 'hackDecision', targetUserId: data.fromId, success });
+            };
+            ok.onclick = ()=> decide(true);
+            ko.onclick = ()=> decide(false);
+        } else if (data.type === 'gasRequest' && game.user.isGM) {
+            // Liste multi-sélection des tokens à gazer (empoisonner)
+            const tokens = Array.from(canvas?.tokens?.placeables || []);
+            const dialog = document.createElement('div');
+            dialog.style.cssText = 'background:black; border:2px solid #ff9900; color:#ff9900; padding:10px; z-index:100004; font-family:monospace; min-width:300px;';
+            const title = document.createElement('div'); title.textContent = game.i18n.localize('MUTHUR.approve.gasTargets'); title.style.cssText = 'margin-bottom:6px; font-weight:bold;'; dialog.appendChild(title);
+            const list = document.createElement('div'); list.style.maxHeight = '260px'; list.style.overflow = 'auto'; list.style.marginBottom = '8px';
+            const selections = new Map();
+            tokens.forEach((t)=>{
+                const row = document.createElement('label'); row.style.cssText = 'display:flex; align-items:center; gap:8px; margin:3px 0;';
+                const cb = document.createElement('input'); cb.type = 'checkbox'; cb.onchange = ()=> selections.set(t.id, cb.checked);
+                const name = document.createElement('span'); name.textContent = t.name || '—';
+                row.appendChild(cb); row.appendChild(name); list.appendChild(row);
+            });
+            dialog.appendChild(list);
+            const actions = document.createElement('div'); actions.style.cssText = 'display:flex; gap:8px; justify-content:flex-end;';
+            const confirm = document.createElement('button'); confirm.textContent = 'OK'; confirm.style.cssText = 'background:black; border:1px solid #00ff00; color:#00ff00; padding:2px 8px;';
+            const cancel = document.createElement('button'); cancel.textContent = 'X'; cancel.style.cssText = 'background:black; border:1px solid #ff0000; color:#ff0000; padding:2px 8px;';
+            confirm.onclick = async ()=>{
+                const picked = tokens.filter(t => selections.get(t.id));
+                const affected = await applyPoisonToTokens(picked);
+                const label = picked.map(t=>t.name).filter(Boolean).join(', ');
+                const msg = `${affected} ${game.i18n.localize('MUTHUR.entitiesAffected') || 'entities affected'} (poisoned).${label ? ' ['+label+']' : ''}`;
+                notifyBackToRequester(data.fromId, msg, '#00ff00');
+                broadcastToSpectators(msg, '#00ff00');
+                dialog.remove();
+            };
+            cancel.onclick = ()=> dialog.remove();
+            actions.appendChild(confirm); actions.appendChild(cancel); dialog.appendChild(actions);
+            appendDialogToGM(dialog, 'bottom-right', 8);
+        } else if (data.type === 'cryoRequest' && game.user.isGM) {
+            // Lister les tokens de la scène pour sélection GM
+            const tokens = Array.from(canvas?.tokens?.placeables || []);
+            const dialog = document.createElement('div');
+            dialog.style.cssText = 'background:black; border:2px solid #ff9900; color:#ff9900; padding:10px; z-index:100004; font-family:monospace; min-width:260px;';
+            const title = document.createElement('div');
+            title.textContent = game.i18n.localize('MUTHUR.approve.cryoPod').replace('{target}','');
+            title.style.cssText = 'margin-bottom:6px; font-weight:bold;';
+            dialog.appendChild(title);
+            const list = document.createElement('div'); list.style.maxHeight = '240px'; list.style.overflow = 'auto';
+            tokens.forEach((t)=>{
+                const btn = document.createElement('button');
+                btn.textContent = t.name || '—';
+                btn.style.cssText = 'display:block; width:100%; text-align:left; background:black; border:1px solid #ff9900; color:#ff9900; margin:3px 0; padding:4px 8px;';
+                btn.onclick = async ()=>{
+                    dialog.remove();
+                    const ok = await applyCryoEffect(t.name || '');
+                    const msg = ok ? game.i18n.format('MUTHUR.cryoApplied', { name: ok }) : game.i18n.localize('MUTHUR.cryoNoMatch');
+                    notifyBackToRequester(data.fromId, msg, '#00ff00');
+                    broadcastToSpectators(msg, '#00ff00');
+                };
+                list.appendChild(btn);
+            });
+            dialog.appendChild(list);
+            const cancel = document.createElement('button');
+            cancel.textContent = 'X';
+            cancel.style.cssText = 'margin-top:6px; background:black; border:1px solid #ff0000; color:#ff0000; padding:2px 8px; float:right;';
+            cancel.onclick = ()=> dialog.remove();
+            dialog.appendChild(cancel);
+            appendDialogToGM(dialog, 'bottom-right', 8);
+        } else if (data.type === 'cryoReleaseRequest' && game.user.isGM) {
+            (async () => {
+                const tokens = Array.from(canvas?.tokens?.placeables || []);
+                const dialog = document.createElement('div');
+                dialog.style.cssText = 'background:black; border:2px solid #ff9900; color:#ff9900; padding:10px; z-index:100004; font-family:monospace; min-width:300px;';
+                const title = document.createElement('div'); title.textContent = 'CRYO RELEASE'; title.style.cssText = 'margin-bottom:6px; font-weight:bold;'; dialog.appendChild(title);
+                const list = document.createElement('div'); list.style.maxHeight = '260px'; list.style.overflow = 'auto'; list.style.marginBottom = '8px';
+                const selections = new Map();
+                tokens.forEach((t)=>{
+                    const row = document.createElement('label'); row.style.cssText = 'display:flex; align-items:center; gap:8px; margin:3px 0;';
+                    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.onchange = ()=> selections.set(t.id, cb.checked);
+                    const name = document.createElement('span'); name.textContent = t.name || '—';
+                    row.appendChild(cb); row.appendChild(name); list.appendChild(row);
+                });
+                dialog.appendChild(list);
+                const actions = document.createElement('div'); actions.style.cssText = 'display:flex; gap:8px; justify-content:flex-end;';
+                const confirm = document.createElement('button'); confirm.textContent = 'OK'; confirm.style.cssText = 'background:black; border:1px solid #00ff00; color:#00ff00; padding:2px 8px;';
+                const cancel = document.createElement('button'); cancel.textContent = 'X'; cancel.style.cssText = 'background:black; border:1px solid #ff0000; color:#ff0000; padding:2px 8px;';
+                confirm.onclick = async ()=>{
+                    const picked = tokens.filter(t => selections.get(t.id));
+                    const released = await releaseCryoForTokens(picked.length ? picked : tokens.filter(t=>false));
+                    const label = picked.length ? picked.map(t=>t.name).join(', ') : 'NONE';
+                    const msg = released > 0 ? `CRYO RELEASED: ${label}.` : 'NO CRYO TO RELEASE.';
+                    notifyBackToRequester(data.fromId, msg, '#00ff00');
+                    broadcastToSpectators(msg, '#00ff00');
+                    dialog.remove();
+                };
+                cancel.onclick = ()=> dialog.remove();
+                actions.appendChild(confirm); actions.appendChild(cancel); dialog.appendChild(actions);
+                appendDialogToGM(dialog, 'bottom-right', 8);
+            })();
+        } else if (data.type === 'alarmControl') {
+            console.log('[MUTHUR][ALARM] recv alarmControl:', data);
+            // Synchronisation globale: on/off pour joueurs ET spectateurs
+            if (data.action === 'on') {
+                try { triggerAlarm(true); } catch(e) { console.warn('[MUTHUR][ALARM] trigger on error:', e); }
+            } else {
+                try { stopAlarm(); } catch(e) { console.warn('[MUTHUR][ALARM] trigger off error:', e); }
+                try {
+                    const msg = game.i18n.localize('MUTHUR.alarmDeactivated') || 'ALARME DÉSACTIVÉE';
+                    const chatLog = document.querySelector('.muthur-chat-log');
+                    if (chatLog) { displayMuthurMessage(chatLog, msg, '', '#00ff00', 'reply'); }
+                    updateSpectatorsWithMessage(msg, `${game.i18n.localize('MUTHUR.motherName')}: `, '#00ff00', 'reply');
+                } catch(_) {}
+            }
+        } else if (data.type === 'spectatorAlarm' && !game.user.isGM) {
+            try {
+                if (data.action === 'on') {
+                    (window.muthurSpectatorAlarmOn || (()=>{}))();
+                } else {
+                    (window.muthurSpectatorAlarmOff || (()=>{}))();
+                }
+            } catch(_) {}
         }
     });
+    try { window.__muthurMainSocketBound = true; } catch(e) {}
 
     // Log de démarrage
     console.log(game.i18n.localize("MUTHUR.systemReady"));
@@ -2991,26 +3567,25 @@ async function simulateHackingAttempt(chatLog) {
 
     let isSuccess;
     let roll;
-    const hackResult = game.settings.get('alien-mu-th-ur', 'hackResult');
-
-    switch (hackResult) {
-        case "success":
-            isSuccess = true;
-            break;
-        case "failure":
-            isSuccess = false;
-            break;
-        default: // "random"
-            roll = await new Roll('1d6').evaluate({ async: true });
-            isSuccess = roll.total % 2 === 0; // Pair = succès
-
-            // Afficher le résultat du dé visuellement seulement en mode aléatoire
-            await roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ alias: "MU/TH/UR 6000" }),
-                flavor: game.i18n.localize('MOTHER.HackAttempt'),
-                whisper: [game.user.id]
+    // Demander au MJ si le HACK réussit ou non via socket
+    if (!game.user.isGM) {
+        try {
+            await new Promise((resolve) => {
+                game.socket.emit('module.alien-mu-th-ur', { type: 'hackDecisionRequest', fromId: game.user.id, fromName: game.user.name });
+                const handler = (data) => {
+                    if (data.type === 'hackDecision' && data.targetUserId === game.user.id) {
+                        isSuccess = !!data.success;
+                        game.socket.off('module.alien-mu-th-ur', handler);
+                        resolve();
+                    }
+                };
+                game.socket.on('module.alien-mu-th-ur', handler);
             });
-            break;
+        } catch(_) {}
+    } else {
+        // Si GM lance HACK localement, décider par un jet simple
+        roll = await new Roll('1d6').evaluate({ async: true });
+        isSuccess = roll.total % 2 === 0;
     }
 
 
@@ -3424,6 +3999,559 @@ function clearHackingElements() {
     overlays.forEach(overlay => overlay.remove());
 }
 
+// ===== Utilitaires Phase 1 =====
+function getSortedDoorDocuments() {
+    const scene = game.scenes.active;
+    if (!scene) return [];
+    // V13 Walls collection: use documents with door type
+    const walls = scene.walls?.contents || scene.walls || [];
+    // Filter doors: foundry door flags: door > 0
+    const doorDocs = walls.filter(w => (w.document?.door ?? w.door ?? 0) > 0);
+    // Sort by x,y to give stable indexing
+    const sorted = doorDocs.slice().sort((a,b)=>{
+        const ac = (a.document?.c || a.c || [0,0]);
+        const bc = (b.document?.c || b.c || [0,0]);
+        const ax = ac[0], ay = ac[1];
+        const bx = bc[0], by = bc[1];
+        return ax - bx || ay - by;
+    });
+    return sorted;
+}
+
+// getDepAirlockDoors removed
+
+function getDoorPreferredLabel(doorDoc) {
+    const doc = doorDoc?.document || doorDoc;
+    const flags = doc?.flags || {};
+    const tagger = flags['tagger']?.tags || [];
+    const our = flags['alien-mu-th-ur'] || {};
+    const name = doc?.name || '';
+    const tags = [].concat(name ? [name] : [], tagger, our.tags || [], our.airlockTag || []);
+    const ad = tags.find(t => /^AD/i.test(String(t)));
+    return ad || name || '';
+}
+
+function getDoorsByPrefix(prefix) {
+    const all = getSortedDoorDocuments();
+    return all.filter(d => {
+        const label = getDoorPreferredLabel(d);
+        return label && new RegExp(`^${prefix}`, 'i').test(label);
+    });
+}
+
+async function applyDoorAction(doorDoc, action) {
+    if (!doorDoc) return;
+    const doc = doorDoc.document || doorDoc;
+    const current = doc.ds ?? doc.document?.ds; // door state (0=open,1=closed,2=locked) legacy varies
+    let targetState = current;
+    if (action === 'LOCK') targetState = 2;
+    if (action === 'UNLOCK') targetState = 1; // closed but unlocked
+    try {
+        await doc.update?.({ ds: targetState }) || await doc.update({ ds: targetState });
+    } catch(e) {}
+}
+
+// Sauvegarde/restauration état des lumières
+let savedLightStates = null;
+async function applyLightsAction(action) {
+    const scene = game.scenes.active;
+    if (!scene) return 'No active scene.';
+    const lights = scene.lights?.contents || scene.lights || [];
+    if (action === 'SHUTDOWN') {
+        // Save current intensities and turns off
+        savedLightStates = lights.map(l=>({ id: (l.id || l.document?.id), bright: l.document?.bright ?? l.bright, dim: l.document?.dim ?? l.dim, hidden: l.document?.hidden ?? l.hidden, alpha: l.document?.alpha ?? l.alpha }));
+        for (const l of lights) {
+            const doc = l.document || l;
+            await doc.update({ hidden: true, alpha: 0 });
+        }
+        return game.i18n.localize('MUTHUR.lightsShutdown') || 'Lights shutdown complete.';
+    }
+    if (action === 'DIM') {
+        if (!savedLightStates) {
+            savedLightStates = lights.map(l=>({ id: (l.id || l.document?.id), bright: l.document?.bright ?? l.bright, dim: l.document?.dim ?? l.dim, hidden: l.document?.hidden ?? l.hidden, alpha: l.document?.alpha ?? l.alpha }));
+        }
+        for (const l of lights) {
+            const doc = l.document || l;
+            const curBright = doc.bright ?? doc.document?.bright ?? 1;
+            const curDim = doc.dim ?? doc.document?.dim ?? 1;
+            await doc.update({ hidden: false, alpha: 0.5, bright: Math.max(0, curBright * 0.5), dim: Math.max(0, curDim * 0.5) });
+        }
+        return game.i18n.localize('MUTHUR.lightsDimmed') || 'Lights dimmed.';
+    }
+    if (action === 'RESTORE') {
+        if (!savedLightStates) return game.i18n.localize('MUTHUR.noSavedLights') || 'No saved lights state to restore.';
+        const byId = new Map(savedLightStates.map(s=>[s.id, s]));
+        for (const l of lights) {
+            const doc = l.document || l;
+            const s = byId.get(doc.id);
+            if (!s) continue;
+            await doc.update({ hidden: s.hidden, alpha: s.alpha, bright: s.bright, dim: s.dim });
+        }
+        return game.i18n.localize('MUTHUR.lightsRestored') || 'Lights restored.';
+    }
+    return 'OK';
+}
+
+async function applySealDeck(deck) {
+    const doors = getSortedDoorDocuments();
+    let count = 0;
+    for (const d of doors) {
+        await applyDoorAction(d, 'LOCK');
+        count++;
+    }
+    return count;
+}
+
+function showApprovalDialog(text, cb) {
+    if (!game.user.isGM) return;
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'background:black; border:2px solid #ff9900; color:#ff9900; padding:10px; z-index:100004; font-family:monospace;';
+    const t = document.createElement('div'); t.textContent = text; t.style.marginBottom = '8px'; wrap.appendChild(t);
+    const ok = document.createElement('button'); ok.textContent = 'OK'; ok.style.cssText = 'background:black; color:#00ff00; border:1px solid #00ff00; padding:4px 10px; margin-right:6px;';
+    const ko = document.createElement('button'); ko.textContent = 'X'; ko.style.cssText = 'background:black; color:#ff0000; border:1px solid #ff0000; padding:4px 10px;';
+    wrap.appendChild(ok); wrap.appendChild(ko);
+    appendDialogToGM(wrap, 'bottom-right', 8);
+    ok.onclick = ()=>{ wrap.remove(); try{ cb(true); }catch(e){} };
+    ko.onclick = ()=>{ wrap.remove(); try{ cb(false); }catch(e){} };
+}
+
+function notifyBackToRequester(userId, text, color) {
+    if (!userId) return;
+    game.socket.emit('module.alien-mu-th-ur', { type: 'muthurResponse', targetUserId: userId, command: text, color: color || '#00ff00' });
+}
+
+function broadcastToSpectators(text, color) {
+    try { const motherName = game.i18n.localize('MUTHUR.motherName'); updateSpectatorsWithMessage(text, `${motherName}: `, color || '#00ff00', 'reply'); } catch(e) {}
+}
+
+// Ancre les petites fenêtres (approbations, sélections) au terminal GM
+function appendDialogToGM(element, position = 'bottom-right', margin = 10) {
+    try {
+        const container = document.getElementById('gm-muthur-container');
+        if (container) {
+            element.style.position = 'absolute';
+            element.style.left = element.style.right = element.style.top = element.style.bottom = '';
+            switch (position) {
+                case 'top-right':
+                    element.style.top = `${margin}px`;
+                    element.style.right = `${margin}px`;
+                    break;
+                case 'top-left':
+                    element.style.top = `${margin}px`;
+                    element.style.left = `${margin}px`;
+                    break;
+                case 'bottom-left':
+                    element.style.bottom = `${margin}px`;
+                    element.style.left = `${margin}px`;
+                    break;
+                default: // bottom-right
+                    element.style.bottom = `${margin}px`;
+                    element.style.right = `${margin}px`;
+            }
+            container.appendChild(element);
+            return true;
+        }
+    } catch(_) {}
+    // Fallback: position fixe écran si pas de container
+    element.style.position = 'fixed';
+    element.style.right = '20px';
+    element.style.bottom = '150px';
+    document.body.appendChild(element);
+    return false;
+}
+
+function buildPostHackHelpList() {
+    const lines = [];
+    const g = (k)=>{ try { return game.settings.get('alien-mu-th-ur', k); } catch(e) { return false; } };
+    if (g('phSpecialOrders')) lines.push('- ORDERS: 754, 899, 931, 937, 939, 966');
+    lines.push('- CERBERUS');
+    if (g('phDoors')) lines.push('- DOORS, LOCK DOOR X, UNLOCK DOOR X');
+    if (g('phLights')) lines.push('- SHUTDOWN LIGHTS, RESTORE LIGHTS');
+    if (g('phAlarm')) lines.push('- ACTIVATE ALARM');
+    if (g('phGas')) lines.push('- GAS TARGETS');
+    if (g('phCryo')) { lines.push('- CRYO POD <NAME?>'); lines.push('- CRYO RELEASE'); }
+    
+    if (!lines.length) return '';
+    const title = (game.i18n.localize('MUTHUR.postHack.title') || 'POST-HACK COMMANDS:');
+    return title + '\n' + lines.join('\n');
+}
+
+// ===== Phase 2 utilitaires =====
+let currentAlarm = { howl: null, src: null };
+async function triggerAlarm(withOverlay) {
+    try {
+        // Jouer le son configuré
+        const src = (game.settings.get('alien-mu-th-ur', 'alarmSoundPath') || '').trim();
+        console.log('[MUTHUR][ALARM] triggerAlarm requested | withOverlay=', withOverlay, '| src=', src);
+        const volume = 1.0;
+        if (src) {
+            try {
+                if (currentAlarm.howl && typeof currentAlarm.howl.stop === 'function') { try { currentAlarm.howl.stop(); } catch(e) { console.warn('[MUTHUR][ALARM] pre-stop error:', e); } }
+            } catch(_) {}
+            try {
+                const result = await AudioHelper.play({ src, volume, autoplay: true, loop: true }, true);
+                currentAlarm.howl = result; // certains systèmes renvoient un Howl, d'autres un Promise résolu
+                currentAlarm.src = src;
+                console.log('[MUTHUR][ALARM] playing started | resultType=', typeof result, '| hasStop=', !!(result && result.stop), '| hasPause=', !!(result && result.pause));
+            } catch(e) {
+                console.error('[MUTHUR][ALARM] play error:', e);
+                await playErrorSound?.();
+            }
+        } else {
+            console.warn('[MUTHUR][ALARM] no src configured');
+            await playErrorSound?.();
+        }
+    } catch(e) {}
+    if (withOverlay) {
+        console.log('[MUTHUR][ALARM] creating overlay');
+        const id = 'muthur-alarm-overlay';
+        let ov = document.getElementById(id);
+        if (!ov) {
+            ov = document.createElement('div');
+            ov.id = id;
+            ov.style.cssText = 'position:fixed; inset:0; background:rgba(255,0,0,0.12); pointer-events:none; z-index:100002; animation: alarmPulse 1s infinite;';
+            const style = document.createElement('style');
+            style.textContent = '@keyframes alarmPulse { 0%{opacity:0.3} 50%{opacity:0.6} 100%{opacity:0.3} }';
+            style.setAttribute('data-hacking','');
+            document.head.appendChild(style);
+            document.body.appendChild(ov);
+        }
+    }
+}
+
+function stopAlarm() {
+    console.log('[MUTHUR][ALARM] stopAlarm requested | current=', currentAlarm);
+
+    // 1. Enlever l'overlay visuel de l'alarme
+    try {
+        const ov = document.getElementById('muthur-alarm-overlay');
+        if (ov) {
+            ov.remove();
+            console.log('[MUTHUR][ALARM] overlay removed');
+        }
+    } catch (e) {
+        console.warn('[MUTHUR][ALARM] overlay remove error:', e);
+    }
+
+    // 2. Arrêter le son de manière fiable via son chemin d'accès (src)
+    if (currentAlarm.src) {
+        try {
+            if (typeof AudioHelper?.stop === 'function') {
+                AudioHelper.stop({ src: currentAlarm.src });
+                console.log(`[MUTHUR][ALARM] AudioHelper.stop called for src: ${currentAlarm.src}`);
+            }
+            // Fallback agressif: parcourir les sons en cours et stopper ceux qui correspondent
+            try {
+                const playing = game?.audio?.playing;
+                if (playing && typeof playing.values === 'function') {
+                    for (const sound of playing.values()) {
+                        try {
+                            if (sound && sound.src === currentAlarm.src) {
+                                sound.stop?.();
+                                console.log(`[MUTHUR][ALARM] Forcefully stopped sound with matching src: ${sound.src}`);
+                            }
+                        } catch (_) {}
+                    }
+                }
+            } catch (_) {}
+        } catch (e) {
+            console.error('[MUTHUR][ALARM] AudioHelper.stop error:', e);
+        }
+    }
+
+    // 3. Réinitialiser la variable globale pour éviter les erreurs futures
+    currentAlarm.howl = null;
+    currentAlarm.src = null;
+
+    // 4. Cacher le bouton "STOP ALARME" de l'interface du MJ
+    try {
+        const headerStopBtn = document.getElementById('gm-muthur-stop-alarm-btn');
+        if (headerStopBtn) {
+            headerStopBtn.style.display = 'none';
+        }
+    } catch (_) {}
+}
+
+async function triggerConfinementAroundSelection() {
+    const scene = game.scenes.active;
+    if (!scene) return {count:0};
+    const token = canvas?.tokens?.controlled?.[0] || canvas?.tokens?.hover;
+    const zoneName = token?.name || 'TARGET';
+    let count = 0;
+    // Stratégie simple: verrouiller les portes les plus proches (rayon)
+    const doors = getSortedDoorDocuments();
+    const tCenter = token?.center || token?.document?.center || {x:0,y:0};
+    for (const d of doors) {
+        const c = (d.document?.c || d.c || [0,0]);
+        const dx = (c[0] - tCenter.x), dy = (c[1] - tCenter.y);
+        const dist = Math.hypot(dx, dy);
+        if (dist < 600) { await applyDoorAction(d, 'LOCK'); count++; }
+    }
+    return {count, zoneName};
+}
+
+async function performZoneScan(zoneLabel) {
+    // Recherche de zones définies par le MJ via Tuiles ou Régions dont le nom commence par "ALIEN"
+    const scene = game.scenes.active;
+    if (!scene) return '0 ' + (game.i18n.localize('MUTHUR.lifeformsDetected') || 'lifeforms detected') + ': -';
+    const tiles = canvas?.tiles?.placeables || [];
+    const regions = canvas?.regions?.placeables || [];
+    const targets = [];
+    const upper = (zoneLabel || '').toUpperCase();
+    for (const t of tiles) {
+        const label = (t.document?.name || t.document?.texture?.src || '').toUpperCase();
+        if (label.startsWith('ALIEN') && (upper === '' || label.includes(upper))) {
+            const x = t.document?.x ?? t.x ?? t.center?.x ?? 0;
+            const y = t.document?.y ?? t.y ?? t.center?.y ?? 0;
+            const w = t.document?.width ?? t.w ?? t.document?.texture?.width ?? 0;
+            const h = t.document?.height ?? t.h ?? t.document?.texture?.height ?? 0;
+            targets.push({ x: x + w/2, y: y + h/2, w, h });
+        }
+    }
+    for (const r of regions) {
+        const label = (r.document?.name || '').toUpperCase();
+        if (label.startsWith('ALIEN') && (upper === '' || label.includes(upper))) {
+            const x = r.document?.x ?? r.x ?? r.center?.x ?? 0;
+            const y = r.document?.y ?? r.y ?? r.center?.y ?? 0;
+            const w = r.document?.width ?? r.w ?? 0;
+            const h = r.document?.height ?? r.h ?? 0;
+            targets.push({ x: x + w/2, y: y + h/2, w, h });
+        }
+    }
+    // Si aucune zone ALIEN correspondante, 0 résultat
+    if (!targets.length) return '0 ' + (game.i18n.localize('MUTHUR.lifeformsDetected') || 'lifeforms detected') + ': -';
+    const tokens = canvas?.tokens?.placeables || [];
+    const isInside = (tok, Z) => {
+        const tx = tok.document?.x ?? tok.x ?? tok.center?.x ?? 0;
+        const ty = tok.document?.y ?? tok.y ?? tok.center?.y ?? 0;
+        const tw = tok.document?.width ?? tok.w ?? tok.document?.texture?.width ?? (tok.w ?? 0);
+        const th = tok.document?.height ?? tok.h ?? tok.document?.texture?.height ?? (tok.h ?? 0);
+        const cx = tx + (tw/2);
+        const cy = ty + (th/2);
+        return cx >= Z.x - Z.w/2 && cx <= Z.x + Z.w/2 && cy >= Z.y - Z.h/2 && cy <= Z.y + Z.h/2;
+    };
+    const inside = tokens.filter(t => targets.some(Z => isInside(t, Z)));
+    const names = inside.map(t => {
+        const actorType = t.actor?.type || '';
+        const isHuman = /human|pc|npc|colonist|crew/i.test(actorType) || /ripley|bishop|hudson|hicks|crew/i.test(t.name || '');
+        return isHuman ? (t.name || 'Unknown') : game.i18n.localize('MUTHUR.unknownEntity') || 'Unknown entity';
+    });
+    const count = names.length;
+    const joined = names.join(', ');
+    return `${count} ${game.i18n.localize('MUTHUR.lifeformsDetected') || 'lifeforms detected'}: ${joined || '-'}.`;
+}
+
+// ===== Phase 3 utilitaires =====
+async function applyGasEffect() {
+    // Affecter les tokens proches du token sélectionné
+    const token = canvas?.tokens?.controlled?.[0] || canvas?.tokens?.hover;
+    const center = token?.center || token?.document?.center || {x:0,y:0};
+    const radius = 500;
+    const tokens = canvas?.tokens?.placeables || [];
+    let affected = 0;
+    for (const t of tokens) {
+        const dist = Math.hypot(t.center.x - center.x, t.center.y - center.y);
+        if (dist <= radius) {
+            affected++;
+            try {
+                await t.document?.setFlag?.('alien-mu-th-ur', 'gas', { poisoned: true, unconscious: true });
+            } catch(e) {}
+        }
+    }
+    try { await playErrorSound?.(); } catch(e) {}
+    return affected;
+}
+
+// Nouvelle version: appliquer l'effet gaz à une sélection précise de tokens
+async function applyPoisonToTokens(tokens) {
+    const list = Array.from(tokens || []);
+    let affected = 0;
+    for (const t of list) {
+        try {
+            // Sélection visuelle côté MJ
+            try { t.control({ releaseOthers: false }); } catch(e) {}
+            // Appliquer un status "poisoned" robuste (selon la config)
+            const poisoned = getPoisonedEffect();
+            if (typeof t.toggleStatusEffect === 'function') {
+                await t.toggleStatusEffect(poisoned.id || poisoned.icon, { active: true, overlay: false });
+            } else if (typeof t.document?.toggleStatusEffect === 'function') {
+                await t.document.toggleStatusEffect(poisoned.id || poisoned.icon, { active: true, overlay: false });
+            } else if (typeof t.toggleEffect === 'function') {
+                await t.toggleEffect(poisoned.icon || poisoned.id, { active: true, overlay: false });
+            }
+            const actor = t.document?.actor;
+            if (actor) {
+                if (typeof actor.toggleStatusEffect === 'function') {
+                    await actor.toggleStatusEffect(poisoned.id || poisoned.icon, { active: true });
+                } else if (typeof actor.setStatusEffect === 'function') {
+                    await actor.setStatusEffect(poisoned.id || poisoned.icon, { active: true });
+                } else {
+                    // Fallback ActiveEffect statusId
+                    const effectData = {
+                        name: 'Poisoned',
+                        label: 'Poisoned',
+                        icon: poisoned.icon || 'icons/svg/poison.svg',
+                        disabled: false,
+                        origin: 'alien-mu-th-ur',
+                        flags: { core: { statusId: poisoned.id || 'poisoned' } }
+                    };
+                    try { await actor.createEmbeddedDocuments('ActiveEffect', [effectData]); } catch(_) {}
+                }
+            }
+            // Flag interne
+            await t.document?.setFlag?.('alien-mu-th-ur', 'gas', { poisoned: true });
+            affected++;
+        } catch(e) {}
+    }
+    try { await playErrorSound?.(); } catch(e) {}
+    return affected;
+}
+
+function getPoisonedEffect() {
+    try {
+        const effects = (CONFIG.statusEffects ?? []);
+        const list = Array.isArray(effects) ? effects : Array.from(effects.values?.() || []);
+        const match = list.find(e => {
+            const id = (e.id || e.label || e.name || '').toString().toLowerCase();
+            const label = (e.label || e.name || '').toString().toLowerCase();
+            return id.includes('poison') || label.includes('poison') || id.includes('toxic') || label.includes('toxic');
+        }) || {};
+        const id = match.id || match.label || match.name || null;
+        const icon = match.icon || 'icons/svg/poison.svg';
+        return { id, icon };
+    } catch (e) {
+        return { id: null, icon: 'icons/svg/poison.svg' };
+    }
+}
+
+function getUnconsciousEffect() {
+    try {
+        const effects = (CONFIG.statusEffects ?? []);
+        const list = Array.isArray(effects) ? effects : Array.from(effects.values?.() || []);
+        const match = list.find(e => {
+            const id = (e.id || e.label || e.name || '').toString().toLowerCase();
+            const label = (e.label || e.name || '').toString().toLowerCase();
+            return id.includes('unconscious') || id.includes('inconscient') || label.includes('unconscious') || label.includes('inconscient') || id.includes('sleep') || id.includes('stasis');
+        }) || {};
+        const id = match.id || match.label || match.name || null;
+        const icon = match.icon || 'icons/svg/sleep.svg';
+        const resolved = { id, icon };
+        console.log('CRYO | resolved effect', resolved);
+        return resolved;
+    } catch (e) {
+        const fallback = { id: null, icon: 'icons/svg/sleep.svg' };
+        console.warn('CRYO | resolve effect failed, fallback used', e);
+        return fallback;
+    }
+}
+
+async function applyCryoEffect(targetName) {
+    const tokens = canvas?.tokens?.placeables || [];
+    let matched = null;
+    if (targetName) {
+        matched = tokens.find(t => (t.name || '').toUpperCase() === targetName.toUpperCase());
+    } else {
+        matched = canvas?.tokens?.controlled?.[0] || null;
+    }
+    if (!matched) return '';
+
+    // Sélectionner le token côté MJ
+    try { matched.control({ releaseOthers: true }); } catch(e) { try { matched.control(); } catch(_) {} }
+
+    // Appliquer un flag interne
+    try { await matched.document?.setFlag?.('alien-mu-th-ur', 'cryo', { stasis: true }); } catch(e) { console.warn('CRYO | setFlag failed', e); }
+
+    // Appliquer l'effet d'état "inconscient"
+    const eff = getUnconsciousEffect();
+    try {
+        if (typeof matched.toggleStatusEffect === 'function') {
+            console.log('CRYO | Token.toggleStatusEffect', eff.id || eff.icon);
+            await matched.toggleStatusEffect(eff.id || eff.icon, { active: true, overlay: true });
+        } else if (typeof matched.document?.toggleStatusEffect === 'function') {
+            console.log('CRYO | TokenDocument.toggleStatusEffect', eff.id || eff.icon);
+            await matched.document.toggleStatusEffect(eff.id || eff.icon, { active: true, overlay: true });
+        } else if (typeof matched.toggleEffect === 'function') {
+            console.log('CRYO | Token.toggleEffect', eff.icon || eff.id);
+            await matched.toggleEffect(eff.icon || eff.id, { active: true, overlay: true });
+        } 
+
+        // Essayer aussi côté acteur
+        const actor = matched.document?.actor;
+        if (actor) {
+            if (typeof actor.toggleStatusEffect === 'function') {
+                console.log('CRYO | Actor.toggleStatusEffect', eff.id || eff.icon);
+                await actor.toggleStatusEffect(eff.id || eff.icon, { active: true, overlay: false });
+            } else if (typeof actor.setStatusEffect === 'function') {
+                console.log('CRYO | Actor.setStatusEffect', eff.id || eff.icon);
+                await actor.setStatusEffect(eff.id || eff.icon, { active: true });
+            }
+        }
+
+        // Fallback ultime: créer un ActiveEffect statusId
+        if (actor) {
+            const effectData = {
+                name: 'Unconscious',
+                label: 'Unconscious',
+                icon: eff.icon || 'icons/svg/unconscious.svg',
+                disabled: false,
+                origin: 'alien-mu-th-ur',
+                flags: { core: { statusId: eff.id || 'unconscious' } }
+            };
+            console.log('CRYO | ensure AE with statusId', effectData);
+            try { await actor.createEmbeddedDocuments('ActiveEffect', [effectData]); } catch(err) { /* ignore if already exists */ }
+        }
+    } catch(e) { console.warn('CRYO | status effect failed', e); }
+
+    return matched.name || 'TARGET';
+}
+
+async function releaseCryoForTokens(tokenList) {
+    let released = 0;
+    const eff = getUnconsciousEffect();
+    for (const tok of tokenList) {
+        try {
+            // Sélectionner pour feedback visuel
+            try { tok.control({ releaseOthers: false }); } catch(e) {}
+            // Enlever flag
+            try { await tok.document?.unsetFlag?.('alien-mu-th-ur', 'cryo'); } catch(e) { console.warn('CRYO | unsetFlag failed', e); }
+            // Désactiver status effect si présent
+            if (typeof tok.toggleStatusEffect === 'function') {
+                console.log('CRYO | Token.disable toggleStatusEffect', eff.id || eff.icon);
+                await tok.toggleStatusEffect(eff.id || eff.icon, { active: false, overlay: false });
+            } else if (typeof tok.document?.toggleStatusEffect === 'function') {
+                console.log('CRYO | TokenDocument.disable toggleStatusEffect', eff.id || eff.icon);
+                await tok.document.toggleStatusEffect(eff.id || eff.icon, { active: false, overlay: false });
+            } else if (typeof tok.toggleEffect === 'function') {
+                console.log('CRYO | Token.disable toggleEffect', eff.icon || eff.id);
+                await tok.toggleEffect(eff.icon || eff.id, { active: false, overlay: false });
+            }
+            // Supprimer ActiveEffects minimal si créé
+            const actor = tok.document?.actor;
+            if (actor?.effects) {
+                const toDelete = actor.effects.filter(e => (e.origin === 'alien-mu-th-ur') || (e.icon === (eff.icon || eff.id)) || (e.flags?.core?.statusId === (eff.id || 'unconscious')) || ((e.label||'').toLowerCase().includes('unconscious') || (e.label||'').toLowerCase().includes('inconscient')));
+                if (toDelete.length) {
+                    console.log('CRYO | delete AE on actor', toDelete.map(e=>e.id));
+                    await actor.deleteEmbeddedDocuments('ActiveEffect', toDelete.map(e=>e.id));
+                }
+            }
+            if (actor) {
+                // Décocher statut côté acteur si API dispo
+                if (typeof actor.toggleStatusEffect === 'function') {
+                    console.log('CRYO | Actor.toggleStatusEffect OFF', eff.id || eff.icon);
+                    await actor.toggleStatusEffect(eff.id || eff.icon, { active: false });
+                } else if (typeof actor.setStatusEffect === 'function') {
+                    console.log('CRYO | Actor.setStatusEffect OFF', eff.id || eff.icon);
+                    await actor.setStatusEffect(eff.id || eff.icon, { active: false });
+                }
+            }
+            released++;
+        } catch(e) {}
+    }
+    return released;
+}
+
+// triggerDepressurization removed
+
 async function handleSpecialOrder(chatLog, command) {
     const orders = {
         "754": "MOTHER.SpecialOrders.754",
@@ -3453,8 +4581,12 @@ async function handleSpecialOrder(chatLog, command) {
 
     if (orders[orderKey]) {
         if (orderKey === 'CERBERUS') {
-            if (!game.settings.get('alien-mu-th-ur', 'allowCerberus')) {
-                await displayMuthurMessage(chatLog, game.i18n.localize('MOTHER.CerberusDisabled'), '', '#ff0000', 'error');
+            // Demande d'approbation MJ et saisie de la durée
+            if (!game.user.isGM) {
+                try {
+                    game.socket.emit('module.alien-mu-th-ur', { type: 'cerberusApprovalRequest', fromId: game.user.id, fromName: game.user.name });
+                    await displayMuthurMessage(chatLog, game.i18n.localize('MUTHUR.waitingForMother'), '', '#ff0000', 'communication');
+                } catch(_) {}
                 return;
             }
 
@@ -3657,13 +4789,14 @@ async function handleSpecialOrder(chatLog, command) {
 
 
             createCerberusWindow();
-            startCerberusCountdown();
+            startCerberusCountdown(window.__cerberusDurationMinutes || 10);
 
             // Envoyer le signal à tous les autres clients
             game.socket.emit('module.alien-mu-th-ur', {
                 type: 'showCerberusGlobal',
                 fromId: game.user.id,
                 fromName: game.user.name,
+                minutes: window.__cerberusDurationMinutes || 10,
                 startTime: Date.now()
             });
 
@@ -3827,7 +4960,7 @@ async function displayCerberusProtocol(chatLog) {
         ${game.i18n.localize("MOTHER.CerberusEvacuate")}
     </div>
     <div class="cerberus-countdown">
-        ${game.settings.get('alien-mu-th-ur', 'cerberusDuration')}:00
+        ${(window.__cerberusDurationMinutes || 10)}:00
     </div>
     <div class="cerberus-warning">
         ${game.i18n.localize("MOTHER.SpecialOrders.Cerberus.NoReturn")}
@@ -3851,7 +4984,7 @@ async function displayCerberusProtocol(chatLog) {
     }, 10000);
 
     // Initialiser le compte à rebours
-    const duration = game.settings.get('alien-mu-th-ur', 'cerberusDuration');
+    const duration = (window.__cerberusDurationMinutes || 10);
     let timeLeft = duration * 60; // Convertir les minutes en secondes
 
     // ... début du code inchangé jusqu'au setInterval ...
@@ -3997,7 +5130,7 @@ function createCerberusWindow() {
                 ${game.i18n.localize("MOTHER.CerberusWarning")}
             </div>
             <div id="cerberus-floating-countdown" class="cerberus-countdown">
-                ${game.settings.get('alien-mu-th-ur', 'cerberusDuration')}:00
+                ${(window.__cerberusDurationMinutes || 10)}:00
             </div>
             <div class="cerberus-status">
                 ${game.i18n.localize("MOTHER.SpecialOrders.Cerberus.Warning")}<br>

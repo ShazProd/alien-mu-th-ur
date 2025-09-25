@@ -34,6 +34,61 @@
         "clickToStart": "Klikk for å starte oppstartssekvensen",
         "enableSound": "Aktiver lyd",
         "enableSoundHint": "Klikk for å aktivere lyd for denne økten",
+        "waitingForMother": "VENTER PÅ MOR",
+        "requestSent": "Forespørsel sendt til MJ...",
+        "noDoorsFound": "Ingen dører funnet.",
+        "doorListHeader": "Dører i området:",
+        "permissionDenied": "TILGANG NEKTET.",
+        "requestDenied": "Forespørsel avslått.",
+        "approve": {
+            "lockDoor": "LÅSE {label}?",
+            "unlockDoor": "LÅSE OPP {label}?",
+            "dimLights": "DEMP LYS?",
+            "shutdownLights": "SLÅ AV LYS?",
+            "restoreLights": "GJENOPPRETTE LYS?",
+            "activateAlarm": "AKTIVERE ALARM?",
+            "gasTargets": "GASSE MÅL I OMRÅDET?",
+            "cryoPod": "CRYO POD {target}?"
+        },
+        "doorLocked": "DØR {label} LÅST.",
+        "doorUnlocked": "DØR {label} LÅST OPP.",
+        "alarmActivated": "ALARM AKTIVERT.",
+        "stopAlarm": "STOPP ALARM",
+        "alarmDeactivated": "ALARM DEAKTIVERT.",
+        "target": "MÅL",
+        "cryoApplied": "CRYO-STASE BRUKT: {name}.",
+        "cryoNoMatch": "INGEN MATCHENDE CRYO-MÅL.",
+        "lightsShutdown": "Utslåing av lys fullført.",
+        "lightsDimmed": "Lys dempet.",
+        "noSavedLights": "Ingen lagret lysstatus å gjenopprette.",
+        "lightsRestored": "Lys gjenopprettet.",
+        "unknownEntity": "ukjent enhet",
+        "lifeformsDetected": "livsformer oppdaget",
+        "entitiesAffected": "påvirkede enheter",
+        "postHack": { "title": "POST-HACK-KOMMANDOER:" },
+            "alarmSoundPath": {
+                "name": "ALARMLYD",
+                "hint": "Velg lydfilen som spilles når ALARM er aktiv"
+            },
+        "helpMenu": {
+            "title": "KOMMANDOHJELP",
+            "tooltip": "Kommandohjelp",
+            "close": "LUKK",
+            "consultHint": "SE ? FOR KOMMANDOLISTEN",
+            "sections": {
+                "intro": "LISTE OG BESKRIVELSE AV TILGJENGELIGE POST-HACK-KOMMANDOER (MED MJ-GODKJENNING).",
+                "basic": { "title": "GRUNNKOMMANDOER", "desc": "HELP: VIS DENNE HJELPEN\nSTATUS: SYSTEMSTATUS\nCLEAR: TØM SKJERM\nEXIT: LUKK TERMINAL\n/M [MELDING]: KOMMUNISER MED MOR" },
+                "hack": { "title": "HACK", "desc": "HACK: FORSØK Å FÅ ADMIN-RETTIGHETER (GM-STYRT)" },
+                "specialOrders": { "title": "SPESIALORDRER", "desc": "ORDERS: 754, 899, 931, 937, 939, 966. Viser ordrer detaljer." },
+                "cerberus": { "title": "CERBERUS-PROTOKOLL", "desc": "CERBERUS: SELVDESTRUKSJONSPROTOKOLL MED NEDTELLING." },
+                "doors": { "title": "DØRKONTROLL", "desc": "DOORS, LOCK DOOR X, UNLOCK DOOR X. MÅLRETTER DØRER 'AD*'." },
+                "lights": { "title": "LYSKONTROLL", "desc": "SHUTDOWN LIGHTS, RESTORE LIGHTS. SLÅ AV OG GJENOPPRETT LYS." },
+                "alarm": { "title": "ALARM", "desc": "ACTIVATE ALARM. SPILLER ALARM OG KAN LEGGE RØD OVERLAY." },
+                "gas": { "title": "GASS", "desc": "GAS TARGETS. PÅFØRER FORGIFTET/BEVISSTLØS EFFEKT I OMRÅDET." },
+                "cryo": { "title": "CRYO POD", "desc": "CRYO POD [NAVN?]. LISTE OVER TOKEN, MJ VELGER MÅL FOR STASE." },
+                "cryoRelease": { "title": "CRYO RELEASE", "desc": "CRYO RELEASE. LISTE OVER KARAKTERER I STASE FOR FLERUTVALG FRIGIVELSE." }
+            }
+        },
         "Time": {
                 "Minute": "minutt",
                 "Minutes": "minutter",
@@ -49,6 +104,16 @@
             "useTokenName": {
                 "name": "Bruk Karakternavn",
                 "hint": "Bruk karakternavn i stedet for spillernavn i meldinger"
+            },
+            "postHack": {
+                "phShowInHelp": {"name": "ETTER HACK: VIS NYE KOMMANDOER I HELP", "hint": "Hvis aktivert, inkluderer HELP avanserte kommandoer."},
+                "phSpecialOrders": {"name": "ETTER HACK: SPESIALORDRER", "hint": "Tillat SPESIALORDRER etter HACK."},
+                "phCerberus": {"name": "ETTER HACK: CERBERUS-PROTOKOLL", "hint": "Tillat CERBERUS etter HACK."},
+                "phDoors": {"name": "ETTER HACK: DØRKONTROLL", "hint": "Tillat LOCK/UNLOCK/DOORS."},
+                "phLights": {"name": "ETTER HACK: LYSKONTROLL", "hint": "Tillat DIM/SHUTDOWN/RESTORE LIGHTS."},
+                "phAlarm": {"name": "ETTER HACK: AKTIVER ALARM", "hint": "Tillat alarmlyd + overlay."},
+                "phGas": {"name": "ETTER HACK: GAS TARGETS", "hint": "Tillat gaseffekt (forgiftet/bevisstløs)."},
+                "phCryo": {"name": "ETTER HACK: CRYO POD/RELEASE", "hint": "Tillat stase/frigi et mål."}
             },
             "typewriter": {
                 "name": "Skrivemaskineffekt",
@@ -78,6 +143,8 @@
                 "name": "Skrivelydvolum",
                 "hint": "Justerer volumet på skrivelydene (0 = stille, 1 = maksimum)"
             },
+            "allowDragGM": { "name": "Flytt terminal (GM)", "hint": "Tillat MOR (GM) å dra terminalen på scenen." },
+            "allowDragPlayers": { "name": "Flytt terminal (Spillere/Tilskuere)", "hint": "Tillat spillere og tilskuere å dra terminalen på scenen." },
             "motherResponseColor": {
                 "name": "MOTHER Svarfarge",
                 "hint": "Setter fargen på MOTHERs svarmeldinger",

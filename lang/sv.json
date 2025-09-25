@@ -34,6 +34,61 @@
         "clickToStart": "Klicka för att starta uppstartssekvensen",
         "enableSound": "Aktivera ljud",
         "enableSoundHint": "Klicka för att aktivera ljud för denna session",
+        "waitingForMother": "VÄNTAR PÅ MODER",
+        "requestSent": "Förfrågan skickad till GM...",
+        "noDoorsFound": "Inga dörrar hittades.",
+        "doorListHeader": "Dörrar i området:",
+        "permissionDenied": "ÅTKOMST NEKAD.",
+        "requestDenied": "Förfrågan nekad.",
+        "approve": {
+            "lockDoor": "LÅSA {label}?",
+            "unlockDoor": "LÅSA UPP {label}?",
+            "dimLights": "DÄMPA LJUS?",
+            "shutdownLights": "STÄNGA AV LJUS?",
+            "restoreLights": "ÅTERSTÄLLA LJUS?",
+            "activateAlarm": "AKTIVERA ALARM?",
+            "gasTargets": "GASA MÅL I OMRÅDET?",
+            "cryoPod": "CRYO POD {target}?"
+        },
+        "doorLocked": "DÖRR {label} LÅST.",
+        "doorUnlocked": "DÖRR {label} UPPLÅST.",
+        "alarmActivated": "ALARM AKTIVERAT.",
+        "stopAlarm": "STOPPA ALARM",
+        "alarmDeactivated": "ALARM AVAKTIVERAD.",
+        "target": "MÅL",
+        "cryoApplied": "CRYO-STASIS APPLICERAD: {name}.",
+        "cryoNoMatch": "INGET MATCHANDE CRYO-MÅL.",
+        "lightsShutdown": "Avstängning av ljus slutförd.",
+        "lightsDimmed": "Ljus dämpade.",
+        "noSavedLights": "Ingen sparad ljusstatus att återställa.",
+        "lightsRestored": "Ljus återställda.",
+        "unknownEntity": "okänd enhet",
+        "lifeformsDetected": "livsformer upptäckta",
+        "entitiesAffected": "påverkade enheter",
+        "postHack": { "title": "POST-HACK-KOMMANDON:" },
+            "alarmSoundPath": {
+                "name": "ALARMLJUD",
+                "hint": "Välj ljudfilen som spelas när ALARM är aktiv"
+            },
+        "helpMenu": {
+            "title": "KOMMANDOHJÄLP",
+            "tooltip": "Kommandohjälp",
+            "close": "STÄNG",
+            "consultHint": "KONSULTERA ? FÖR KOMMANDOLISTAN",
+            "sections": {
+                "intro": "LISTA OCH BESKRIVNING AV TILLGÄNGLIGA POST-HACK-KOMMANDON (MED GM-GODKÄNNANDE).",
+                "basic": { "title": "GRUNDKOMMANDON", "desc": "HELP: VISA DENNA HJÄLP\nSTATUS: SYSTEMSTATUS\nCLEAR: RENSA SKÄRM\nEXIT: STÄNG TERMINAL\n/M [MEDDELANDE]: KOMMUNICERA MED MODER" },
+                "hack": { "title": "HACK", "desc": "HACK: FÖRSÖK ATT FÅ ADMINRÄTTIGHETER (GM-STYRT)" },
+                "specialOrders": { "title": "SPECIALORDER", "desc": "ORDERS: 754, 899, 931, 937, 939, 966. VISAR ORDERDETALJER." },
+                "cerberus": { "title": "CERBERUS-PROTOKOLL", "desc": "CERBERUS: SJÄLVFÖRSTÖRELSEPROTOKOLL MED NEDRÄKNING." },
+                "doors": { "title": "DÖRRKONTROLL", "desc": "DOORS, LOCK DOOR X, UNLOCK DOOR X. MÅLRiktar DÖRRAR 'AD*'." },
+                "lights": { "title": "LJUSKONTROLL", "desc": "SHUTDOWN LIGHTS, RESTORE LIGHTS. STÄNGER AV OCH ÅTERSTÄLLER BELYSNING." },
+                "alarm": { "title": "ALARM", "desc": "ACTIVATE ALARM. SPELAR ALARM OCH KAN LÄGGA RÖD OVERLAY." },
+                "gas": { "title": "GAS", "desc": "GAS TARGETS. APPLICERAR FÖRGIFTAD/MEDETSLÖS EFFEKT I OMRÅDET." },
+                "cryo": { "title": "CRYO POD", "desc": "CRYO POD [NAMN?]. LISTAR TOKENS, GM VÄLJER MÅL FÖR STASIS." },
+                "cryoRelease": { "title": "CRYO RELEASE", "desc": "CRYO RELEASE. LISTAR KARAKTÄRER I STASIS FÖR FLERVALSFRIGIVNING." }
+            }
+        },
         "Time": {
                 "Minute": "minut",
                 "Minutes": "minuter",
@@ -49,6 +104,16 @@
             "useTokenName": {
                 "name": "Använd Karaktärsnamn",
                 "hint": "Använd karaktärsnamn istället för spelarnamn i meddelanden"
+            },
+            "postHack": {
+                "phShowInHelp": {"name": "EFTER HACK: VISA NYA KOMMANDON I HELP", "hint": "Om aktiverat inkluderar HELP avancerade kommandon."},
+                "phSpecialOrders": {"name": "EFTER HACK: SPECIALORDER", "hint": "Tillåt SPECIALORDER efter HACK."},
+                "phCerberus": {"name": "EFTER HACK: CERBERUS PROTOCOL", "hint": "Tillåt CERBERUS-protokoll efter HACK."},
+                "phDoors": {"name": "EFTER HACK: DÖRRKONTROLL", "hint": "Tillåt LOCK/UNLOCK/DOORS."},
+                "phLights": {"name": "EFTER HACK: LJUSKONTROLL", "hint": "Tillåt DIM/SHUTDOWN/RESTORE LIGHTS."},
+                "phAlarm": {"name": "EFTER HACK: AKTIVERA ALARM", "hint": "Tillåt alarmsound + overlay."},
+                "phGas": {"name": "EFTER HACK: GAS TARGETS", "hint": "Tillåt gaseffekt (förgiftad/medvetslös)."},
+                "phCryo": {"name": "EFTER HACK: CRYO POD/RELEASE", "hint": "Tillåt stasis/frisläppande av ett mål."}
             },
             "typewriter": {
                 "name": "Skrivmaskineffekt",
@@ -78,6 +143,8 @@
                 "name": "Skrivljudsvolym",
                 "hint": "Justerar volymen på skrivljuden (0 = tyst, 1 = maximum)"
             },
+            "allowDragGM": { "name": "Flytta terminal (SL)", "hint": "Tillåt MODER (SL) att dra terminalen på scenen." },
+            "allowDragPlayers": { "name": "Flytta terminal (Spelare/Åskådare)", "hint": "Tillåt spelare och åskådare att dra sin terminal på scenen." },
             "motherResponseColor": {
                 "name": "MOTHER Svarsfärg",
                 "hint": "Ställer in färgen på MOTHERs svarsmeddelanden",

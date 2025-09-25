@@ -31,9 +31,40 @@
         "spectatorModeInfo": "Vous êtes en mode spectateur. Vous ne pouvez pas interagir avec MUTHUR.",
         "spectatorWelcome": "Bienvenue en mode spectateur. Vous observez la session MUTHUR de {userName}.",
         "waitingForGM": "En attente de l'autorisation du MJ pour démarrer MUTHUR...",
+        "waitingForMother": "EN ATTENTE DE MAMAN",
         "clickToStart": "Cliquez pour démarrer la séquence de boot",
         "enableSound": "Activer le son",
         "enableSoundHint": "Cliquez pour activer le son pour cette session",
+        "requestSent": "Demande envoyée au MJ...",
+        "noDoorsFound": "Aucune porte trouvée.",
+        "doorListHeader": "Portes dans la zone :",
+        "permissionDenied": "ACCÈS REFUSÉ.",
+        "requestDenied": "Demande refusée.",
+        "approve": {
+            "lockDoor": "VERROUILLER {label} ?",
+            "unlockDoor": "DÉVERROUILLER {label} ?",
+            "dimLights": "ATTÉNUER LES LUMIÈRES ?",
+            "shutdownLights": "ÉTEINDRE LES LUMIÈRES ?",
+            "restoreLights": "RESTAURER LES LUMIÈRES ?",
+            "activateAlarm": "ACTIVER L'ALARME ?",
+            "gasTargets": "GAZER LES CIBLES DANS LA ZONE ?",
+            "cryoPod": "CRYO POD {target} ?"
+        },
+        "doorLocked": "porte {label} VERROUILLÉE.",
+        "doorUnlocked": "porte {label} DÉVERROUILLÉE.",
+        "alarmActivated": "ALARME ACTIVÉE.",
+        "stopAlarm": "STOP ALARME",
+        "alarmDeactivated": "ALARME DÉSACTIVÉE.",
+        "target": "CIBLE",
+        "cryoApplied": "STASE CRYO APPLIQUÉE : {name}.",
+        "cryoNoMatch": "AUCUNE CIBLE CRYO CORRESPONDANTE.",
+        "lightsShutdown": "Extinction des lumières effectuée.",
+        "lightsDimmed": "Lumières atténuées.",
+        "noSavedLights": "Aucun état d'éclairage enregistré à restaurer.",
+        "lightsRestored": "Lumières restaurées.",
+        "unknownEntity": "entité inconnue",
+        "lifeformsDetected": "formes de vie détectées",
+        "entitiesAffected": "entités affectées",
         "Time": {
                 "Minute": "minute",
                 "Minutes": "minutes",
@@ -50,6 +81,22 @@
                 "name": "Utiliser le nom du personnage",
                 "hint": "Utiliser le nom du personnage au lieu du nom du joueur dans les messages"
             },
+            "postHack": {
+                "phShowInHelp": {"name": "Après HACK: afficher les nouvelles commandes dans HELP", "hint": "Si activé, le HELP joueur inclut les commandes avancées."},
+                "phSpecialOrders": {"name": "Après HACK: Ordres spéciaux", "hint": "Autoriser les ORDRES SPÉCIAUX après HACK."},
+                "phCerberus": {"name": "Après HACK: Protocole CERBERUS", "hint": "Autoriser le protocole CERBERUS après HACK."},
+                "phDoors": {"name": "Après HACK: Contrôle des portes", "hint": "Autoriser LOCK/UNLOCK/DOORS."},
+                "phLights": {"name": "Après HACK: Contrôle des lumières", "hint": "Autoriser DIM/SHUTDOWN/RESTORE LIGHTS."},
+                "phAlarm": {"name": "Après HACK: ACTIVATE ALARM", "hint": "Autoriser l’alarme sonore + overlay."},
+                "phGas": {"name": "Après HACK: GAS TARGETS", "hint": "Autoriser l’effet gaz (empoisonné/inconscient)."},
+                "phCryo": {"name": "Après HACK: CRYO POD", "hint": "Autoriser la mise en stase d’une cible."}
+            },
+            "alarmSoundPath": {
+                "name": "SON D'ALARME",
+                "hint": "Choisir le fichier audio joué lors de l'ALARME"
+            },
+            "allowDragGM": { "name": "Déplacer le terminal (MJ)", "hint": "Autoriser MAMAN à déplacer son terminal sur la scène." },
+            "allowDragPlayers": { "name": "Déplacer terminal (Joueurs/Spectateurs)", "hint": "Autoriser les joueurs et spectateurs à déplacer leur terminal sur la scène." },
             "typewriter": {
                 "name": "Effet Machine à écrire",
                 "hint": "Active l'affichage progressif du texte comme dans le film Alien",
@@ -116,6 +163,58 @@
             }
         },
         "motherName": "MAMAN",
+        "postHack": {
+            "title": "COMMANDES POST-HACK:"
+        },
+        "helpMenu": {
+            "title": "AIDE COMMANDES",
+            "tooltip": "Aide des commandes",
+            "close": "FERMER",
+            "consultHint": "CONSULTEZ LE ? POUR LA LISTE DES COMMANDES",
+            "sections": {
+                "intro": "LISTE ET DESCRIPTION DES COMMANDES DISPONIBLES APRÈS HACK (AVEC APPROBATION MJ).",
+                "basic": {
+                    "title": "COMMANDES DE BASE",
+                    "desc": "HELP : AFFICHE L'AIDE\nSTATUS : ÉTAT DU SYSTÈME\nCLEAR : EFFACE L'ÉCRAN\nEXIT : FERME LE TERMINAL\n/M [MESSAGE] : COMMUNIQUER AVEC MAMAN"
+                },
+                "hack": {
+                    "title": "HACK",
+                    "desc": "HACK : TENTE D'OBTENIR DES DROITS ADMINISTRATEURS (SOUS CONTRÔLE DU MJ)"
+                },
+                "specialOrders": {
+                    "title": "ORDRES SPÉCIAUX",
+                    "desc": "ORDERS: 754, 899, 931, 937, 939, 966. PERMET D'AFFICHER LE CONTENU DES ORDRES."
+                },
+                "cerberus": {
+                    "title": "PROTOCOLE CERBERUS",
+                    "desc": "CERBERUS: PROTOCOLE D'AUTO-DESTRUCTION AVEC COMPTE À REBOURS."
+                },
+                "doors": {
+                    "title": "CONTRÔLE DES PORTES",
+                    "desc": "DOORS, LOCK DOOR X, UNLOCK DOOR X. CIBLE LES PORTES NOMMÉES 'AD*'."
+                },
+                "lights": {
+                    "title": "CONTRÔLE DES LUMIÈRES",
+                    "desc": "SHUTDOWN LIGHTS, RESTORE LIGHTS. ÉTEINDRE ET RESTAURER L'ÉCLAIRAGE."
+                },
+                "alarm": {
+                    "title": "ALARME",
+                    "desc": "ACTIVATE ALARM. JOUE UNE ALERTE SONORE ET PEUT APPLIQUER UN OVERLAY ROUGE."
+                },
+                "gas": {
+                    "title": "GAZAGE",
+                    "desc": "GAS TARGETS. APPLIQUE UN EFFET EMPOISONNÉ/INCONSCIENT DANS LA ZONE."
+                },
+                "cryo": {
+                    "title": "CRYO POD",
+                    "desc": "CRYO POD [NOM?]. LISTE LES TOKENS, LE MJ CHOISIT LA CIBLE À METTRE EN STASE."
+                },
+                "cryoRelease": {
+                    "title": "CRYO RELEASE",
+                    "desc": "CRYO RELEASE. LISTE LES PERSONNAGES EN STASE POUR LIBÉRATION MULTI-SÉLECTION."
+                }
+            }
+        },
         "HackAttemptMessage": "{user} a tenté d'utiliser la commande HACK (actuellement désactivée)",
         "SpecialOrderAttempt": "Tentative d'accès ordre spécial : {command}",
         "HackDetectionMessage": "!!! TENTATIVE DE HACKING DÉTECTÉE PAR {userName} !!! - {result}",

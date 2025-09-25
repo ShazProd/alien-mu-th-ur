@@ -34,6 +34,81 @@
         "clickToStart": "Click to start the boot sequence",
         "enableSound": "Enable Sound",
         "enableSoundHint": "Click to enable sound for this session",
+        "waitingForMother": "WAITING FOR MOTHER",
+        "requestSent": "Request sent to GM...",
+        "noDoorsFound": "No doors found.",
+        "doorListHeader": "Doors in area:",
+        "permissionDenied": "ACCESS DENIED.",
+        "requestDenied": "Request denied.",
+        "approve": {
+            "lockDoor": "LOCK {label}?",
+            "unlockDoor": "UNLOCK {label}?",
+            "dimLights": "DIM LIGHTS?",
+            "shutdownLights": "SHUT DOWN LIGHTS?",
+            "restoreLights": "RESTORE LIGHTS?",
+            "activateAlarm": "ACTIVATE ALARM?",
+            "gasTargets": "GAS TARGETS IN AREA?",
+            "cryoPod": "CRYO POD {target}?"
+        },
+        "doorLocked": "door {label} LOCKED.",
+        "doorUnlocked": "door {label} UNLOCKED.",
+        "alarmActivated": "ALARM ACTIVATED.",
+        "stopAlarm": "STOP ALARM",
+        "alarmDeactivated": "ALARM DEACTIVATED.",
+        "target": "TARGET",
+        "cryoApplied": "CRYO STASIS APPLIED: {name}.",
+        "cryoNoMatch": "NO MATCHING CRYO TARGET.",
+        "lightsShutdown": "Lights shutdown completed.",
+        "lightsDimmed": "Lights dimmed.",
+        "noSavedLights": "No saved lighting state to restore.",
+        "lightsRestored": "Lights restored.",
+        "unknownEntity": "unknown entity",
+        "lifeformsDetected": "lifeforms detected",
+        "entitiesAffected": "entities affected",
+        "postHack": { "title": "POST-HACK COMMANDS:" },
+        "helpMenu": {
+            "title": "COMMANDS HELP",
+            "tooltip": "Commands help",
+            "close": "CLOSE",
+            "consultHint": "CONSULT THE ? FOR THE COMMANDS LIST",
+            "sections": {
+                "intro": "LIST AND DESCRIPTION OF AVAILABLE POST-HACK COMMANDS (WITH GM APPROVAL).",
+                "basic": { "title": "BASIC COMMANDS", "desc": "HELP: DISPLAY THIS HELP\nSTATUS: SYSTEM STATUS\nCLEAR: CLEAR SCREEN\nEXIT: CLOSE TERMINAL\n/M [MESSAGE]: COMMUNICATE WITH MOTHER" },
+                "hack": { "title": "HACK", "desc": "HACK: ATTEMPT TO OBTAIN ADMIN RIGHTS (GM-CONTROLLED)" },
+                "specialOrders": {
+                    "title": "SPECIAL ORDERS",
+                    "desc": "ORDERS: 754, 899, 931, 937, 939, 966. DISPLAYS ORDER DETAILS."
+                },
+                "cerberus": {
+                    "title": "CERBERUS PROTOCOL",
+                    "desc": "CERBERUS: SELF-DESTRUCT PROTOCOL WITH COUNTDOWN."
+                },
+                "doors": {
+                    "title": "DOOR CONTROL",
+                    "desc": "DOORS, LOCK DOOR X, UNLOCK DOOR X. TARGETS DOORS NAMED 'AD*'."
+                },
+                "lights": {
+                    "title": "LIGHTS CONTROL",
+                    "desc": "SHUTDOWN LIGHTS, RESTORE LIGHTS. TURN OFF AND RESTORE LIGHTING."
+                },
+                "alarm": {
+                    "title": "ALARM",
+                    "desc": "ACTIVATE ALARM. PLAYS AN ALERT AND CAN APPLY A RED OVERLAY."
+                },
+                "gas": {
+                    "title": "GAS",
+                    "desc": "GAS TARGETS. APPLIES POISONED/UNCONSCIOUS EFFECT IN AREA."
+                },
+                "cryo": {
+                    "title": "CRYO POD",
+                    "desc": "CRYO POD [NAME?]. LISTS TOKENS, GM PICKS TARGET TO PUT IN STASIS."
+                },
+                "cryoRelease": {
+                    "title": "CRYO RELEASE",
+                    "desc": "CRYO RELEASE. LISTS CHARACTERS IN STASIS FOR MULTI-SELECTION RELEASE."
+                }
+            }
+        },
         "Time": {
                 "Minute": "minute",
                 "Minutes": "minutes",
@@ -50,6 +125,22 @@
                 "name": "Use Character Name",
                 "hint": "Use character name instead of player name in messages"
             },
+            "postHack": {
+                "phShowInHelp": {"name": "POST-HACK: SHOW NEW COMMANDS IN HELP", "hint": "If enabled, player HELP includes advanced commands."},
+                "phSpecialOrders": {"name": "POST-HACK: SPECIAL ORDERS", "hint": "Allow SPECIAL ORDERS after HACK."},
+                "phCerberus": {"name": "POST-HACK: CERBERUS PROTOCOL", "hint": "Allow CERBERUS protocol after HACK."},
+                "phDoors": {"name": "POST-HACK: DOOR CONTROL", "hint": "Allow LOCK/UNLOCK/DOORS."},
+                "phLights": {"name": "POST-HACK: LIGHTS CONTROL", "hint": "Allow DIM/SHUTDOWN/RESTORE LIGHTS."},
+                "phAlarm": {"name": "POST-HACK: ACTIVATE ALARM", "hint": "Allow alarm sound + overlay."},
+                "phGas": {"name": "POST-HACK: GAS TARGETS", "hint": "Allow gas effect (poisoned/unconscious)."},
+                "phCryo": {"name": "POST-HACK: CRYO POD/RELEASE", "hint": "Allow stasis/release of a target."}
+            },
+            "alarmSoundPath": {
+                "name": "ALARM SOUND",
+                "hint": "Choose the audio file played when ALARM is active"
+            },
+            "allowDragGM": { "name": "Move terminal (GM)", "hint": "Allow MOTHER (GM) to drag the terminal on the scene." },
+            "allowDragPlayers": { "name": "Move terminal (Players/Spectators)", "hint": "Allow players and spectators to drag their terminal on the scene." },
             "typewriter": {
                 "name": "Typewriter Effect",
                 "hint": "Enables progressive text display like in the Alien movie",

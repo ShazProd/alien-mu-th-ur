@@ -34,6 +34,61 @@
         "clickToStart": "Clic per avviare la sequenza di avvio",
         "enableSound": "Abilita audio",
         "enableSoundHint": "Clicca per abilitare l'audio per questa sessione",
+        "waitingForMother": "IN ATTESA DI MADRE",
+        "requestSent": "Richiesta inviata al MJ...",
+        "noDoorsFound": "Nessuna porta trovata.",
+        "doorListHeader": "Porte nell'area:",
+        "permissionDenied": "ACCESSO NEGATO.",
+        "requestDenied": "Richiesta rifiutata.",
+        "approve": {
+            "lockDoor": "BLOCCARE {label}?",
+            "unlockDoor": "SBLOCCARE {label}?",
+            "dimLights": "DIMINUIRE LUCI?",
+            "shutdownLights": "SPEGNERE LUCI?",
+            "restoreLights": "RIPRISTINARE LUCI?",
+            "activateAlarm": "ATTIVARE ALLARME?",
+            "gasTargets": "GASARE BERSAGLI NELL'AREA?",
+            "cryoPod": "CRYO POD {target}?"
+        },
+        "doorLocked": "PORTA {label} BLOCCATA.",
+        "doorUnlocked": "PORTA {label} SBLOCCATA.",
+        "alarmActivated": "ALLARME ATTIVATO.",
+        "stopAlarm": "FERMA ALLARME",
+        "alarmDeactivated": "ALLARME DISATTIVATO.",
+        "target": "BERSAGLIO",
+        "cryoApplied": "STASI CRYO APPLICATA: {name}.",
+        "cryoNoMatch": "NESSUN BERSAGLIO CRYO CORRISPONDENTE.",
+        "lightsShutdown": "Spegnimento luci completato.",
+        "lightsDimmed": "Luci attenuate.",
+        "noSavedLights": "Nessuno stato luci salvato da ripristinare.",
+        "lightsRestored": "Luci ripristinate.",
+        "unknownEntity": "entità sconosciuta",
+        "lifeformsDetected": "forme di vita rilevate",
+        "entitiesAffected": "entità interessate",
+        "postHack": { "title": "COMANDI POST-HACK:" },
+            "alarmSoundPath": {
+                "name": "SUONO ALLARME",
+                "hint": "Scegli il file audio riprodotto quando l'ALLARME è attivo"
+            },
+        "helpMenu": {
+            "title": "AIUTO COMANDI",
+            "tooltip": "Aiuto comandi",
+            "close": "CHIUDI",
+            "consultHint": "CONSULTA IL ? PER L'ELENCO DEI COMANDI",
+            "sections": {
+                "intro": "ELENCO E DESCRIZIONE DEI COMANDI DISPONIBILI DOPO HACK (CON APPROVAZIONE MJ).",
+                "basic": { "title": "COMANDI DI BASE", "desc": "HELP: MOSTRA QUESTO AIUTO\nSTATUS: STATO DEL SISTEMA\nCLEAR: PULISCI SCHERMO\nEXIT: CHIUDI TERMINALE\n/M [MESSAGGIO]: COMUNICA CON MADRE" },
+                "hack": { "title": "HACK", "desc": "HACK: TENTA DI OTTENERE DIRITTI ADMIN (CONTROLLATO DAL MJ)" },
+                "specialOrders": { "title": "ORDINI SPECIALI", "desc": "ORDERS: 754, 899, 931, 937, 939, 966. MOSTRA I DETTAGLI DEGLI ORDINI." },
+                "cerberus": { "title": "PROTOCOLLO CERBERUS", "desc": "CERBERUS: PROTOCOLLO DI AUTODISTRUZIONE CON CONTO ALLA ROVESCIA." },
+                "doors": { "title": "CONTROLLO PORTE", "desc": "DOORS, LOCK DOOR X, UNLOCK DOOR X. PRENDE DI MIRA PORTE 'AD*'." },
+                "lights": { "title": "CONTROLLO LUCI", "desc": "SHUTDOWN LIGHTS, RESTORE LIGHTS. SPEGNE E RIPRISTINA L'ILLUMINAZIONE." },
+                "alarm": { "title": "ALLARME", "desc": "ACTIVATE ALARM. RIPRODUCE UN ALLARME E PUÒ APPLICARE UN OVERLAY ROSSO." },
+                "gas": { "title": "GAS", "desc": "GAS TARGETS. APPLICA EFFETTO AVVELENATO/INCOSCIENTE NELL'AREA." },
+                "cryo": { "title": "CRYO POD", "desc": "CRYO POD [NOME?]. ELENCA I TOKEN, IL MJ SCEGLIE IL BERSAGLIO PER LA STASI." },
+                "cryoRelease": { "title": "CRYO RELEASE", "desc": "CRYO RELEASE. ELENCA I PERSONAGGI IN STASI PER RILASCIO MULTIPLO." }
+            }
+        },
         "Time": {
                 "Minute": "minuto",
                 "Minutes": "minuti",
@@ -49,6 +104,16 @@
             "useTokenName": {
                 "name": "Usa Nome Personaggio",
                 "hint": "Usa il nome del personaggio invece del nome del giocatore nei messaggi"
+            },
+            "postHack": {
+                "phShowInHelp": {"name": "POST-HACK: MOSTRA NUOVI COMANDI IN HELP", "hint": "Se abilitato, l'HELP del giocatore include i comandi avanzati."},
+                "phSpecialOrders": {"name": "POST-HACK: ORDINI SPECIALI", "hint": "Consenti ORDINI SPECIALI dopo HACK."},
+                "phCerberus": {"name": "POST-HACK: PROTOCOLLO CERBERUS", "hint": "Consenti protocollo CERBERUS dopo HACK."},
+                "phDoors": {"name": "POST-HACK: CONTROLLO PORTE", "hint": "Consenti LOCK/UNLOCK/DOORS."},
+                "phLights": {"name": "POST-HACK: CONTROLLO LUCI", "hint": "Consenti DIM/SHUTDOWN/RESTORE LIGHTS."},
+                "phAlarm": {"name": "POST-HACK: ATTIVARE ALLARME", "hint": "Consenti suono allarme + overlay."},
+                "phGas": {"name": "POST-HACK: GAS TARGETS", "hint": "Consenti effetto gas (avvelenato/incosciente)."},
+                "phCryo": {"name": "POST-HACK: CRYO POD/RELEASE", "hint": "Consenti stasi/rilascio di un bersaglio."}
             },
             "typewriter": {
                 "name": "Effetto Macchina da Scrivere",
@@ -78,6 +143,8 @@
                 "name": "Volume Digitazione",
                 "hint": "Regola il volume dei suoni di digitazione (0 = silenzioso, 1 = massimo)"
             },
+            "allowDragGM": { "name": "Spostare terminale (GM)", "hint": "Consenti a MOTHER (GM) di trascinare il terminale sulla scena." },
+            "allowDragPlayers": { "name": "Spostare terminale (Giocatori/Spettatori)", "hint": "Consenti a giocatori e spettatori di trascinare il proprio terminale sulla scena." },
             "motherResponseColor": {
                 "name": "Colore Risposte MOTHER",
                 "hint": "Imposta il colore dei messaggi di risposta di MOTHER",

@@ -34,6 +34,61 @@
         "clickToStart": "Haz clic para iniciar la secuencia de arranque",
         "enableSound": "Activar sonido",
         "enableSoundHint": "Haz clic para activar el sonido para esta sesión",
+        "waitingForMother": "EN ESPERA DE MADRE",
+        "requestSent": "Solicitud enviada al MJ...",
+        "noDoorsFound": "No se encontraron puertas.",
+        "doorListHeader": "Puertas en la zona:",
+        "permissionDenied": "ACCESO DENEGADO.",
+        "requestDenied": "Solicitud denegada.",
+        "approve": {
+            "lockDoor": "¿BLOQUEAR {label}?",
+            "unlockDoor": "¿DESBLOQUEAR {label}?",
+            "dimLights": "¿ATENUAR LUCES?",
+            "shutdownLights": "¿APAGAR LUCES?",
+            "restoreLights": "¿RESTAURAR LUCES?",
+            "activateAlarm": "¿ACTIVAR ALARMA?",
+            "gasTargets": "¿GASEAR OBJETIVOS EN LA ZONA?",
+            "cryoPod": "CRYO POD {target}?"
+        },
+        "doorLocked": "PUERTA {label} BLOQUEADA.",
+        "doorUnlocked": "PUERTA {label} DESBLOQUEADA.",
+        "alarmActivated": "ALARMA ACTIVADA.",
+        "stopAlarm": "DETENER ALARMA",
+        "alarmDeactivated": "ALARMA DESACTIVADA.",
+        "target": "OBJETIVO",
+        "cryoApplied": "ESTASIS CRYO APLICADA: {name}.",
+        "cryoNoMatch": "NINGÚN OBJETIVO CRYO COINCIDENTE.",
+        "lightsShutdown": "Apagado de luces completado.",
+        "lightsDimmed": "Luces atenuadas.",
+        "noSavedLights": "No hay estado de iluminación guardado para restaurar.",
+        "lightsRestored": "Luces restauradas.",
+        "unknownEntity": "entidad desconocida",
+        "lifeformsDetected": "formas de vida detectadas",
+        "entitiesAffected": "entidades afectadas",
+        "postHack": { "title": "COMANDOS POST-HACK:" },
+            "alarmSoundPath": {
+                "name": "SONIDO DE ALARMA",
+                "hint": "Elegir el archivo de audio reproducido cuando ALARMA está activa"
+            },
+        "helpMenu": {
+            "title": "AYUDA DE COMANDOS",
+            "tooltip": "Ayuda de comandos",
+            "close": "CERRAR",
+            "consultHint": "CONSULTE EL ? PARA LA LISTA DE COMANDOS",
+            "sections": {
+                "intro": "LISTA Y DESCRIPCIÓN DE LOS COMANDOS DISPONIBLES TRAS HACK (CON APROBACIÓN DEL MJ).",
+                "basic": { "title": "COMANDOS BÁSICOS", "desc": "HELP: MUESTRA ESTA AYUDA\nSTATUS: ESTADO DEL SISTEMA\nCLEAR: LIMPIAR PANTALLA\nEXIT: CERRAR TERMINAL\n/M [MENSAJE]: COMUNICAR CON MADRE" },
+                "hack": { "title": "HACK", "desc": "HACK: INTENTO DE OBTENER DERECHOS DE ADMIN (CONTROLADO POR MJ)" },
+                "specialOrders": { "title": "ÓRDENES ESPECIALES", "desc": "ORDERS: 754, 899, 931, 937, 939, 966. MUESTRA DETALLES DE ÓRDENES." },
+                "cerberus": { "title": "PROTOCOL CERBERUS", "desc": "CERBERUS: PROTOCOLO DE AUTODESTRUCCIÓN CON CUENTA ATRÁS." },
+                "doors": { "title": "CONTROL DE PUERTAS", "desc": "DOORS, LOCK DOOR X, UNLOCK DOOR X. OBJETIVO: PUERTAS 'AD*'." },
+                "lights": { "title": "CONTROL DE LUCES", "desc": "SHUTDOWN LIGHTS, RESTORE LIGHTS. APAGAR Y RESTAURAR ILUMINACIÓN." },
+                "alarm": { "title": "ALARMA", "desc": "ACTIVATE ALARM. REPRODUCE ALARMA Y PUEDE APLICAR OVERLAY ROJO." },
+                "gas": { "title": "GAS", "desc": "GAS TARGETS. APLICA EFECTO ENVENENADO/INCONSCIENTE EN LA ZONA." },
+                "cryo": { "title": "CRYO POD", "desc": "CRYO POD [NOMBRE?]. LISTA TOKENS, EL MJ ELIGE OBJETIVO PARA ESTASIS." },
+                "cryoRelease": { "title": "CRYO RELEASE", "desc": "CRYO RELEASE. LISTA PERSONAJES EN ESTASIS PARA LIBERACIÓN MÚLTIPLE." }
+            }
+        },
         "Time": {
                 "Minute": "minuto",
                 "Minutes": "minutos",
@@ -49,6 +104,16 @@
             "useTokenName": {
                 "name": "Usar Nombre del Personaje",
                 "hint": "Usa el nombre del personaje en lugar del nombre del jugador en los mensajes"
+            },
+            "postHack": {
+                "phShowInHelp": {"name": "POST-HACK: MOSTRAR NUEVOS COMANDOS EN HELP", "hint": "Si está activado, HELP del jugador incluye comandos avanzados."},
+                "phSpecialOrders": {"name": "POST-HACK: ÓRDENES ESPECIALES", "hint": "Permitir ÓRDENES ESPECIALES tras HACK."},
+                "phCerberus": {"name": "POST-HACK: PROTOCOLO CERBERUS", "hint": "Permitir protocolo CERBERUS tras HACK."},
+                "phDoors": {"name": "POST-HACK: CONTROL DE PUERTAS", "hint": "Permitir LOCK/UNLOCK/DOORS."},
+                "phLights": {"name": "POST-HACK: CONTROL DE LUCES", "hint": "Permitir DIM/SHUTDOWN/RESTORE LIGHTS."},
+                "phAlarm": {"name": "POST-HACK: ACTIVAR ALARMA", "hint": "Permitir sonido de alarma + overlay."},
+                "phGas": {"name": "POST-HACK: GAS TARGETS", "hint": "Permitir efecto gas (envenenado/inconsciente)."},
+                "phCryo": {"name": "POST-HACK: CRYO POD/RELEASE", "hint": "Permitir estasis/liberación de un objetivo."}
             },
             "typewriter": {
                 "name": "Efecto Máquina de Escribir",
@@ -78,6 +143,8 @@
                 "name": "Volumen de Tecleo",
                 "hint": "Ajusta el volumen de los sonidos de tecleo (0 = silencio, 1 = máximo)"
             },
+            "allowDragGM": { "name": "Mover terminal (MJ)", "hint": "Permitir a MADRE (MJ) arrastrar el terminal en la escena." },
+            "allowDragPlayers": { "name": "Mover terminal (Jugadores/Espectadores)", "hint": "Permitir a jugadores y espectadores arrastrar su terminal en la escena." },
             "motherResponseColor": {
                 "name": "Color de Respuesta MOTHER",
                 "hint": "Establece el color de los mensajes de respuesta de MOTHER",
